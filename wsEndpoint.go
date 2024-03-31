@@ -27,7 +27,7 @@ func reader(conn *websocket.Conn) {
 		msgOut := string(p)
 
 		if msg == "vol" {
-			msgOut = "100%"
+			msgOut = getVol()
 		}
 
 		if err := conn.WriteMessage(messageType, []byte(msgOut)); err != nil {
