@@ -1,4 +1,7 @@
 github.com/gorilla/websocket v1.5.1 h1:gmztn0JnHVt9JZquRuzLw3g4wouNVzKL15iLr/zn/QY=
 github.com/gorilla/websocket v1.5.1/go.mod h1:x3kM2JMyaluk02fnUJpQuwD2dCS5NDG2ZHL0uE0tcaY=
+github.com/lawl/pulseaudio v0.0.0-20220626105240-976bed5e247c/go.mod h1:9h36x4KH7r2V8DOCKoPMt87IXZ++X90y8D5nnuwq290=
 golang.org/x/net v0.17.0 h1:pVaXccu2ozPjCXewfr1S7xza/zcXTity9cCdXQYSjIM=
 golang.org/x/net v0.17.0/go.mod h1:NxSsAGuq816PNPmqtQdLE42eU2Fs7NoRIZrHJAlaCOE=
+mrogalski.eu/go/pulseaudio v0.0.0-20240327130323-384e01075e6e h1:SQSUCiMUx1MukBgCf+pYWTOCoV0Y2YbQ0y2vqBvCY50=
+mrogalski.eu/go/pulseaudio v0.0.0-20240327130323-384e01075e6e/go.mod h1:C3V0v+gsiHHbMtFJvwozjNVdPJZw9oUxlRTVc619wSU=
