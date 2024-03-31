@@ -8,14 +8,9 @@ import (
 
 const PORT = ":8448"
 
-func homePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Home Page hit by clien")
-
-	fmt.Fprintf(w, "Welcome on 'home' endpoint")
-}
-
 func setupRoutes() {
 	http.HandleFunc("/", homePage)
+	http.HandleFunc("/ws", wsEndpoint)
 }
 
 func main() {
