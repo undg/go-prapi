@@ -1,14 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"mrogalski.eu/go/pulseaudio"
 )
 
+type Audio struct {
+	volume float32
+	mute   bool
+}
+
 // don't forget to closeClient()
-func openClient() pulseaudio.Client {
+func clientOpen() pulseaudio.Client {
 	client, err := pulseaudio.NewClient()
 	if err != nil {
 		panic(err)
@@ -17,58 +21,101 @@ func openClient() pulseaudio.Client {
 	return *client
 }
 
-func closeClient(client pulseaudio.Client) {
-	defer client.Close()
+func clientClose(c pulseaudio.Client) {
+	defer c.Close()
 }
 
-func getVol() float32 {
-	client := openClient()
-
-	volume, err := client.Volume()
+func clientToggleMute(c pulseaudio.Client) bool {
+	mute, err := c.ToggleMute()
 	if err != nil {
-		log.Println("ERROR getVol client.Volume", err)
+		log.Println("ERROR clientToggleMute c.ToggleMute", err)
 	}
+	return mute
+}
 
-	closeClient(client)
+func clientMute(c pulseaudio.Client) {
+	err := c.SetMute(true)
+	if err != nil {
+		log.Println("ERROR clientMute c.SetMute", err)
+	}
+}
+
+func clientUnMute(c pulseaudio.Client) {
+	err := c.SetMute(false)
+	if err != nil {
+		log.Println("ERROR clientUnMute c.SetMute", err)
+	}
+}
+
+func clientMuteStatus(c pulseaudio.Client) bool {
+	mute, err := c.Mute()
+	if err != nil {
+		log.Println("ERROR clientMuteStatus c.Mute", err)
+	}
+	return mute
+}
+
+func clientVolume(c pulseaudio.Client) float32 {
+	volume, err := c.Volume()
+	if err != nil {
+		log.Println("ERROR clientVolume c.Volume", err)
+	}
 	return volume
 }
 
-func setVol(vol float32) float32 {
-	client := openClient()
+func getVol() Audio {
+	c := clientOpen()
 
-	err := client.SetVolume(vol)
-	if err != nil {
-		log.Println("ERROR setVol client.SetVolume", err)
-	}
+	volume := clientVolume(c)
+	mute := clientMuteStatus(c)
 
-	currVol, err := client.Volume()
-	if err != nil {
-		log.Println("ERROR setVol client.Volume", err)
-	}
-
-	closeClient(client)
-	return currVol
+	clientClose(c)
+	return Audio{volume, mute}
 }
 
-func toggleMute() float32 {
-	client := openClient()
+func setVol(vol float32) Audio {
+	c := clientOpen()
 
-	b, err := client.ToggleMute()
+	err := c.SetVolume(vol)
 	if err != nil {
-		log.Println("ERROR setVol client.SetVolume", err)
+		log.Println("ERROR setVol c.SetVolume", err)
 	}
 
-	if b {
-		fmt.Println("mute on")
-	} else {
-		fmt.Println("mute off")
-	}
+	clientUnMute(c)
+	volume := clientVolume(c)
+	mute := clientMuteStatus(c)
 
-	currVol, err := client.Volume()
-	if err != nil {
-		log.Println("ERROR setVol client.Volume", err)
-	}
+	clientClose(c)
+	return Audio{volume, mute}
+}
 
-	closeClient(client)
-	return currVol
+func toggleMute() Audio {
+	c := clientOpen()
+
+	volume := clientVolume(c)
+	mute := clientToggleMute(c)
+
+	clientClose(c)
+	return Audio{volume, mute}
+}
+
+func mute() Audio {
+	c := clientOpen()
+
+	clientMute(c)
+	volume := clientVolume(c)
+	mute := clientMuteStatus(c)
+
+	clientClose(c)
+	return Audio{volume, mute}
+}
+func unMute() Audio {
+	c := clientOpen()
+
+	clientUnMute(c)
+	volume := clientVolume(c)
+	mute := clientMuteStatus(c)
+
+	clientClose(c)
+	return Audio{volume, mute}
 }
