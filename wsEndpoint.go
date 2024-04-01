@@ -26,8 +26,16 @@ func reader(conn *websocket.Conn) {
 		msg := string(p)
 		msgOut := string(p)
 
-		if msg == "vol" {
-			msgOut = getVol()
+		if msg == "get" {
+			msgOut = fmt.Sprint(getVol())
+		}
+
+		if msg == "set" {
+			msgOut = fmt.Sprint(setVol(0.5))
+		}
+
+		if msg == "mute" {
+			msgOut = fmt.Sprint(toggleMute())
 		}
 
 		if err := conn.WriteMessage(messageType, []byte(msgOut)); err != nil {
