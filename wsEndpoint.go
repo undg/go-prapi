@@ -27,15 +27,23 @@ func reader(conn *websocket.Conn) {
 		msgOut := string(p)
 
 		if msg == "get" {
-			msgOut = fmt.Sprint(getVol())
+			msgOut = string(marshalAudio(getVol()))
 		}
 
 		if msg == "set" {
-			msgOut = fmt.Sprint(setVol(0.5))
+			msgOut = string(marshalAudio(setVol(0.5)))
+		}
+
+		if msg == "muteToggle" {
+			msgOut = string(marshalAudio(toggleMute()))
 		}
 
 		if msg == "mute" {
-			msgOut = fmt.Sprint(toggleMute())
+			msgOut = string(marshalAudio(mute()))
+		}
+
+		if msg == "unMute" {
+			msgOut = string(marshalAudio(unMute()))
 		}
 
 		if err := conn.WriteMessage(messageType, []byte(msgOut)); err != nil {
