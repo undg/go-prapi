@@ -35,13 +35,19 @@ func readerJson(conn *websocket.Conn) {
 
 		switch {
 		case msg.GetCards:
-			res.message = "NOT_IMPLEMENTED"
+			b, err := json.Marshal(getCards())
+			if err != nil {
+				log.Println("ERROR readerJson json.Marshal", err)
+				res.error = "ERROR can't pull cards informations"
+				break
+			}
+			res.response = string(b)
 		case msg.UseCard != "":
-			res.message = "NOT_IMPLEMENTED"
+			res.response = "NOT_IMPLEMENTED"
 		case msg.GetSinks:
-			res.message = "NOT_IMPLEMENTED"
+			res.response = "NOT_IMPLEMENTED"
 		case msg.UseSink != "":
-			res.message = "NOT_IMPLEMENTED"
+			res.response = "NOT_IMPLEMENTED"
 		case msg.GetVol:
 			res.Audio = getVol()
 		case msg.SetVol != nil && *msg.SetVol >= 0 && *msg.SetVol < 2.0:
@@ -54,10 +60,14 @@ func readerJson(conn *websocket.Conn) {
 			s, err := schema.Generate(reflect.TypeOf(Request{}))
 			if err != nil {
 				log.Println("ERROR readerJson schema.Generate", err)
+				res.error = "ERROR can't generate schema"
+				break
 			}
 			bytes, err := json.Marshal(s)
 			if err != nil {
 				log.Println("ERROR readerJson json.Marshal", err)
+				res.error = "ERROR can't marshal JSON"
+				break
 			}
 			res.schema = string(bytes)
 		}

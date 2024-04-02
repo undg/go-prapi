@@ -110,3 +110,32 @@ func mute(isMuted bool) Audio {
 	clientClose(c)
 	return Audio{volume, mute}
 }
+
+type CardInfo struct {
+	Name  string
+	Index uint32
+}
+
+func getCards() []CardInfo {
+	c := clientOpen()
+
+	cards, err := c.Cards()
+	if err != nil {
+		// @TODO (undg) 2024-04-03: return nil, error and handle it later
+		log.Println("ERROR clientVolume c.Volume", err)
+	}
+
+	clientClose(c)
+
+	cardsInfo := []CardInfo{}
+
+	for _, card := range cards {
+		cardInfo := CardInfo{
+			Name:  card.Name,
+			Index: card.Index,
+		}
+		cardsInfo = append(cardsInfo, cardInfo)
+	}
+
+	return cardsInfo
+}
