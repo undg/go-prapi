@@ -12,9 +12,9 @@ type Audio struct {
 
 type Result struct {
 	Audio
-	schema  string
-	message string
-	error   string
+	schema   string
+	response string
+	error    string
 }
 
 func marshalResult(a Result) []byte {
@@ -33,9 +33,11 @@ func marshalResult(a Result) []byte {
 
 func (a Result) MarshalJSON() ([]byte, error) {
 	jsonData, err := json.Marshal(map[string]interface{}{
-		"volume": a.volume,
-		"mute":   a.mute,
-		"schema": a.schema,
+		"volume":   a.volume,
+		"mute":     a.mute,
+		"schema":   a.schema,
+		"response": a.response,
+		"error":    a.error,
 	})
 
 	return jsonData, err
