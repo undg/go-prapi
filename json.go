@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 )
 
@@ -11,10 +10,18 @@ type Audio struct {
 	mute   bool
 }
 
-func marshalAudio(a Audio) []byte {
+type Result struct {
+	Audio
+	schema  string
+	message string
+	error   string
+}
+
+func marshalResult(a Result) []byte {
 	jsonData, err := json.Marshal(map[string]interface{}{
 		"volume": a.volume,
 		"mute":   a.mute,
+		"schema": a.schema,
 	})
 
 	if err != nil {
@@ -24,25 +31,12 @@ func marshalAudio(a Audio) []byte {
 	return jsonData
 }
 
-func (a Audio) MarshalJSON() ([]byte, error) {
+func (a Result) MarshalJSON() ([]byte, error) {
 	jsonData, err := json.Marshal(map[string]interface{}{
 		"volume": a.volume,
 		"mute":   a.mute,
+		"schema": a.schema,
 	})
 
 	return jsonData, err
-}
-
-func a() {
-	j := string(marshalAudio(unMute()))
-	fmt.Println(j)
-}
-func t() {
-	audioInstance := unMute()
-	m, err := json.Marshal(audioInstance)
-	if err != nil {
-		log.Println(err)
-	}
-
-	fmt.Println(string(m))
 }

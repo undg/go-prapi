@@ -5,75 +5,78 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"reflect"
 
+	"github.com/danielgtaylor/huma/schema"
 	"github.com/gorilla/websocket"
 )
 
-type msg struct {
-	Set        *float32
-	Vol        *bool
-	Mute       *bool
-	UnMute     *bool
-	ToggleMute *bool
-	Msg        *string
+type Request struct {
+	GetCards      bool     `json:"get_cards" doc:"NOT_IMPLEMENTED"`
+	UseCard       string   `json:"use_card" doc:"NOT_IMPLEMENTED"`
+	GetSinks      bool     `json:"get_sinks" doc:"NOT_IMPLEMENTED"`
+	UseSink       string   `json:"use_sink" doc:"NOT_IMPLEMENTED"`
+	GetVol        bool     `json:"get_vol" doc:"Request volume level (true)"`
+	SetVol        *float32 `json:"set_vol" doc:"Set volume value as an float between 0.0 and 2.0"`
+	Mute          *bool    `json:"mute" doc:"Mute or unMute (true/false)"`
+	ToggleMute    bool     `json:"toggle_mute (true)"`
+	GetJsonSchema bool     `json:"get_json_schema" doc:"NOT_IMPLEMENTED get this JSON schema (true)"`
 }
 
 func readerJson(conn *websocket.Conn) {
 	for {
-		m := msg{}
+		msg := Request{}
+		res := Result{}
 
-		err := conn.ReadJSON(&m)
-		if err != nil {
+		if err := conn.ReadJSON(&msg); err != nil {
 			log.Println("ERROR conn.ReadJSON", err)
+			return
 		}
 
-		bytes, err := json.MarshalIndent(m, "", "	")
-		if err != nil {
-			log.Println("ERROR readerJson json.MarshalIndent", err)
+		switch {
+		case msg.GetCards:
+			res.message = "NOT_IMPLEMENTED"
+		case msg.UseCard != "":
+			res.message = "NOT_IMPLEMENTED"
+		case msg.GetSinks:
+			res.message = "NOT_IMPLEMENTED"
+		case msg.UseSink != "":
+			res.message = "NOT_IMPLEMENTED"
+		case msg.GetVol:
+			res.Audio = getVol()
+		case msg.SetVol != nil && *msg.SetVol >= 0 && *msg.SetVol < 2.0:
+			res.Audio = setVol(*msg.SetVol)
+		case msg.Mute != nil:
+			res.Audio = mute(*msg.Mute)
+		case msg.ToggleMute:
+			res.Audio = toggleMute()
+		case msg.GetJsonSchema:
+			s, err := schema.Generate(reflect.TypeOf(Request{}))
+			if err != nil {
+				log.Println("ERROR readerJson schema.Generate", err)
+			}
+			bytes, err := json.Marshal(s)
+			if err != nil {
+				log.Println("ERROR readerJson json.Marshal", err)
+			}
+			res.schema = string(bytes)
 		}
 
-		fmt.Printf("Got JSON: \n%v\n", string(bytes))
+		serverLog(msg, res)
 
-		if err := conn.WriteJSON(m); err != nil {
+		if err := conn.WriteJSON(res); err != nil {
 			log.Println(err)
 		}
 	}
 }
 
-func reader(conn *websocket.Conn) {
-	for {
-		messageType, p, err := conn.ReadMessage()
-		if err != nil {
-			log.Println(err)
-		}
-
-		msg := string(p)
-		msgOut := string(p)
-
-		if msg == "get" {
-			msgOut = string(marshalAudio(getVol()))
-		}
-
-		if msg == "set" {
-			msgOut = string(marshalAudio(setVol(0.5)))
-		}
-
-		if msg == "muteToggle" {
-			msgOut = string(marshalAudio(toggleMute()))
-		}
-
-		if msg == "mute" {
-			msgOut = string(marshalAudio(mute()))
-		}
-
-		if msg == "unMute" {
-			msgOut = string(marshalAudio(unMute()))
-		}
-
-		if err := conn.WriteMessage(messageType, []byte(msgOut)); err != nil {
-			log.Println(err)
-		}
+func serverLog(msg Request, res Result) {
+	bytes, err := json.MarshalIndent(msg, "", "	")
+	if err != nil {
+		log.Println("ERROR readerJson json.MarshalIndent", err)
 	}
+	fmt.Println("request:", string(bytes))
+	fmt.Println("response:", string(marshalResult(res)))
 }
 
 var upgrader = websocket.Upgrader{
@@ -84,10 +87,14 @@ var upgrader = websocket.Upgrader{
 func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("wsEndpoint visited by:", r.Host, r.RemoteAddr)
 
-	// upgrader.CheckOrigin = func(r *http.Request) bool {
-	// 	// @TODO (undg) 2024-04-01: r.Host bla bla bla
-	// 	return true
-	// }
+	upgrader.CheckOrigin = func(r *http.Request) bool {
+		switch {
+		case r.Host == "localhost"+PORT:
+			return true
+		default:
+			return false
+		}
+	}
 
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {

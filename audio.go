@@ -94,20 +94,16 @@ func toggleMute() Audio {
 	return Audio{volume, mute}
 }
 
-func mute() Audio {
+func mute(isMuted bool) Audio {
 	c := clientOpen()
 
-	clientMute(c)
-	volume := clientVolume(c)
-	mute := clientMuteStatus(c)
+	switch {
+	case isMuted:
+		clientMute(c)
+	case !isMuted:
+		clientUnMute(c)
+	}
 
-	clientClose(c)
-	return Audio{volume, mute}
-}
-func unMute() Audio {
-	c := clientOpen()
-
-	clientUnMute(c)
 	volume := clientVolume(c)
 	mute := clientMuteStatus(c)
 
