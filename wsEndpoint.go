@@ -1,20 +1,44 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
+type msg struct {
+	Set        *float32
+	Vol        *bool
+	Mute       *bool
+	UnMute     *bool
+	ToggleMute *bool
+	Msg        *string
 }
 
-const writeWait = 10 * time.Second
+func readerJson(conn *websocket.Conn) {
+	for {
+		m := msg{}
+
+		err := conn.ReadJSON(&m)
+		if err != nil {
+			log.Println("ERROR conn.ReadJSON", err)
+		}
+
+		bytes, err := json.MarshalIndent(m, "", "	")
+		if err != nil {
+			log.Println("ERROR readerJson json.MarshalIndent", err)
+		}
+
+		fmt.Printf("Got JSON: \n%v\n", string(bytes))
+
+		if err := conn.WriteJSON(m); err != nil {
+			log.Println(err)
+		}
+	}
+}
 
 func reader(conn *websocket.Conn) {
 	for {
@@ -52,14 +76,22 @@ func reader(conn *websocket.Conn) {
 	}
 }
 
-func wsEndpoint(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("wsEndpoint visited by:", w.Header())
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
 
-	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+func wsEndpoint(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("wsEndpoint visited by:", r.Host, r.RemoteAddr)
+
+	// upgrader.CheckOrigin = func(r *http.Request) bool {
+	// 	// @TODO (undg) 2024-04-01: r.Host bla bla bla
+	// 	return true
+	// }
 
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 	}
-	reader(ws)
+	go readerJson(ws)
 }

@@ -6,11 +6,6 @@ import (
 	"mrogalski.eu/go/pulseaudio"
 )
 
-type Audio struct {
-	volume float32
-	mute   bool
-}
-
 // don't forget to closeClient()
 func clientOpen() pulseaudio.Client {
 	client, err := pulseaudio.NewClient()
