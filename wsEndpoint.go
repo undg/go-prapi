@@ -12,10 +12,9 @@ import (
 )
 
 type Request struct {
-	GetCards      bool     `json:"get_cards" doc:"NOT_IMPLEMENTED"`
+	GetCards      bool     `json:"get_cards" doc:"Request list of audio cards presented in the system"`
 	UseCard       string   `json:"use_card" doc:"NOT_IMPLEMENTED"`
-	GetSinks      bool     `json:"get_sinks" doc:"NOT_IMPLEMENTED"`
-	UseSink       string   `json:"use_sink" doc:"NOT_IMPLEMENTED"`
+	GetOutputs    bool     `json:"get_outputs" doc:"Request list of audio outputs presented in the system"`
 	GetVol        bool     `json:"get_vol" doc:"Request volume level (true)"`
 	SetVol        *float32 `json:"set_vol" doc:"Set volume value as an float between 0.0 and 2.0"`
 	Mute          *bool    `json:"mute" doc:"Mute or unMute (true/false)"`
@@ -35,7 +34,27 @@ func readerJson(conn *websocket.Conn) {
 
 		switch {
 		case msg.GetCards:
-			b, err := json.Marshal(getCards())
+			cards, err := getCards()
+			if err != nil {
+				log.Println("ERROR readerJson GetCards", err)
+				res.error = "ERROR can't get cards informations from the system"
+				break
+			}
+			b, err := json.Marshal(cards)
+			if err != nil {
+				log.Println("ERROR readerJson json.Marshal", err)
+				res.error = "ERROR can't pull cards informations"
+				break
+			}
+			res.response = string(b)
+		case msg.GetOutputs:
+			outputs, err := getOutputs()
+			if err != nil {
+				log.Println("ERROR readerJson GetOutputs", err)
+				res.error = "ERROR can't get outputs informations from the system"
+				break
+			}
+			b, err := json.Marshal(outputs)
 			if err != nil {
 				log.Println("ERROR readerJson json.Marshal", err)
 				res.error = "ERROR can't pull cards informations"
@@ -43,10 +62,6 @@ func readerJson(conn *websocket.Conn) {
 			}
 			res.response = string(b)
 		case msg.UseCard != "":
-			res.response = "NOT_IMPLEMENTED"
-		case msg.GetSinks:
-			res.response = "NOT_IMPLEMENTED"
-		case msg.UseSink != "":
 			res.response = "NOT_IMPLEMENTED"
 		case msg.GetVol:
 			res.Audio = getVol()
