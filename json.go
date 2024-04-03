@@ -19,9 +19,11 @@ type Result struct {
 
 func marshalResult(a Result) []byte {
 	jsonData, err := json.Marshal(map[string]interface{}{
-		"volume": a.volume,
-		"mute":   a.mute,
-		"schema": a.schema,
+		"volume":   a.volume,
+		"mute":     a.mute,
+		"schema":   a.schema,
+		"response": a.response,
+		"error":    a.error,
 	})
 
 	if err != nil {
