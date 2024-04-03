@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 
 	"mrogalski.eu/go/pulseaudio"
@@ -116,13 +117,13 @@ type CardInfo struct {
 	Index uint32
 }
 
-func getCards() []CardInfo {
+func getCards() ([]CardInfo, error) {
 	c := clientOpen()
 
 	cards, err := c.Cards()
 	if err != nil {
-		// @TODO (undg) 2024-04-03: return nil, error and handle it later
 		log.Println("ERROR clientVolume c.Volume", err)
+		return nil, errors.New("ERROR clientVolume c.Volume")
 	}
 
 	clientClose(c)
@@ -137,5 +138,41 @@ func getCards() []CardInfo {
 		cardsInfo = append(cardsInfo, cardInfo)
 	}
 
-	return cardsInfo
+	return cardsInfo, nil
+}
+
+type OutputsInfo struct {
+	ActiveIndex int
+	CardID      string
+	CardName    string
+	PortName    string
+	Available   bool
+	PortID      string
+}
+
+func getOutputs() ([]OutputsInfo, error) {
+	c := clientOpen()
+
+	output, activeIndex, err := c.Outputs()
+	if err != nil {
+		log.Println("ERROR clientVolume c.Volume", err)
+		return nil, errors.New("ERROR clientVolume c.Volume")
+	}
+
+	clientClose(c)
+
+	outputsInfo := []OutputsInfo{}
+	for _, output := range output {
+		cardInfo := OutputsInfo{
+			ActiveIndex: activeIndex,
+			CardID:      output.CardID,
+			CardName:    output.CardName,
+			PortName:    output.PortName,
+			Available:   output.Available,
+			PortID:      output.PortID,
+		}
+		outputsInfo = append(outputsInfo, cardInfo)
+	}
+
+	return outputsInfo, nil
 }
