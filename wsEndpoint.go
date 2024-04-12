@@ -65,7 +65,7 @@ func readerJson(conn *websocket.Conn) {
 			res.response = "NOT_IMPLEMENTED"
 		case msg.GetVol:
 			res.Audio = getVol()
-		case msg.SetVol != nil && *msg.SetVol >= 0 && *msg.SetVol < 2.0:
+		case msg.SetVol != nil && *msg.SetVol >= 0 && *msg.SetVol <= 2.0:
 			res.Audio = setVol(*msg.SetVol)
 		case msg.Mute != nil:
 			res.Audio = mute(*msg.Mute)
