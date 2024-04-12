@@ -19,8 +19,6 @@ type Result struct {
 
 func marshalResult(a Result) []byte {
 	jsonData, err := json.Marshal(map[string]interface{}{
-		"volume":   a.volume,
-		"mute":     a.mute,
 		"schema":   a.schema,
 		"response": a.response,
 		"error":    a.error,
@@ -35,8 +33,6 @@ func marshalResult(a Result) []byte {
 
 func (a Result) MarshalJSON() ([]byte, error) {
 	jsonData, err := json.Marshal(map[string]interface{}{
-		"volume":   a.volume,
-		"mute":     a.mute,
 		"schema":   a.schema,
 		"response": a.response,
 		"error":    a.error,
