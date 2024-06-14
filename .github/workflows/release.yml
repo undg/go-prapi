@@ -1,0 +1,26 @@
+name: release
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build_release:
+    name: Build_release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Audit
+        run: make audit
+      - name: Build
+        run: |
+          go get -t ./...
+          go build -o prapi
+          zip -r "/tmp/bin/prapi-$GITHUB_REF_NAME.zip" prapi
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            /tmp/bin/prapi-${{ github.ref_name }}.zip
+            /tmp/bin/prapi
