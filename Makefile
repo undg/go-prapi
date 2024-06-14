@@ -50,6 +50,11 @@ audit:
 test:
 	go test -v -race -buildvcs ./...
 
+## test/watch: run all tests in watch mode
+.PHONY: test/watch
+test/watch:
+	./test-watch.sh
+
 ## test/cover: run all tests and display coverage
 .PHONY: test/cover
 test/cover:
