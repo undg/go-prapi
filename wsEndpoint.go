@@ -5,22 +5,37 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"reflect"
+	"strconv"
 
-	"github.com/danielgtaylor/huma/schema"
 	"github.com/gorilla/websocket"
 )
 
 type Request struct {
-	GetCards      bool     `json:"get_cards" doc:"Request list of audio cards presented in the system"`
-	UseCard       string   `json:"use_card" doc:"NOT_IMPLEMENTED"`
-	GetOutputs    bool     `json:"get_outputs" doc:"Request list of audio outputs presented in the system"`
-	GetVol        bool     `json:"get_vol" doc:"Request volume level (true)"`
-	SetVol        *float32 `json:"set_vol" doc:"Set volume value as an float between 0.0 and 2.0"`
-	Mute          *bool    `json:"mute" doc:"Mute or unMute (true/false)"`
-	ToggleMute    bool     `json:"toggle_mute (true)"`
-	GetJsonSchema bool     `json:"get_json_schema" doc:"NOT_IMPLEMENTED get this JSON schema (true)"`
+	Action string      `json:"action" doc:"Action to perform: get or set"`
+	Type   string      `json:"type" doc:"Type of the action: cards, outputs, vol, schema, mute, toggle"`
+	Value  interface{} `json:"value,omitempty" doc:"Optional value for set actions"`
 }
+
+type Response struct {
+	Action string      `json:"action" doc:"Action performed"`
+	Type   string      `json:"type" doc:"Type of the action"`
+	Value  interface{} `json:"value,omitempty" doc:"Resulting value"`
+}
+
+const (
+	ActionGet = "get"
+	ActionSet = "set"
+
+	TypeCards   = "cards"
+	TypeOutputs = "outputs"
+	TypeVol     = "vol"
+	TypeSchema  = "schema"
+	TypeMute    = "mute"
+	TypeToggle  = "toggle"
+)
+
+type GetRequest = string
+type SetRequest = string
 
 func readerJson(conn *websocket.Conn) {
 	for {
@@ -32,59 +47,24 @@ func readerJson(conn *websocket.Conn) {
 			return
 		}
 
-		switch {
-		case msg.GetCards:
-			cards, err := getCards()
-			if err != nil {
-				log.Println("ERROR readerJson GetCards", err)
-				res.error = "ERROR can't get cards informations from the system"
-				break
+		if msg.Action == ActionGet {
+			switch msg.Type {
+			case TypeCards:
+				handleGetCards(&res)
+
+			case TypeOutputs:
+				handleGetOutputs(&res)
+
+			case TypeVol:
+				handleGetVolume(&res)
+
+			case TypeMute:
+				handleGetMute(&res)
 			}
-			b, err := json.Marshal(cards)
-			if err != nil {
-				log.Println("ERROR readerJson json.Marshal", err)
-				res.error = "ERROR can't pull cards informations"
-				break
-			}
-			res.response = string(b)
-		case msg.GetOutputs:
-			outputs, err := getOutputs()
-			if err != nil {
-				log.Println("ERROR readerJson GetOutputs", err)
-				res.error = "ERROR can't get outputs informations from the system"
-				break
-			}
-			b, err := json.Marshal(outputs)
-			if err != nil {
-				log.Println("ERROR readerJson json.Marshal", err)
-				res.error = "ERROR can't pull cards informations"
-				break
-			}
-			res.response = string(b)
-		case msg.UseCard != "":
-			res.response = "NOT_IMPLEMENTED"
-		case msg.GetVol:
-			res.Audio = getVol()
-		case msg.SetVol != nil && *msg.SetVol >= 0 && *msg.SetVol <= 2.0:
-			res.Audio = setVol(*msg.SetVol)
-		case msg.Mute != nil:
-			res.Audio = mute(*msg.Mute)
-		case msg.ToggleMute:
-			res.Audio = toggleMute()
-		case msg.GetJsonSchema:
-			s, err := schema.Generate(reflect.TypeOf(Request{}))
-			if err != nil {
-				log.Println("ERROR readerJson schema.Generate", err)
-				res.error = "ERROR can't generate schema"
-				break
-			}
-			bytes, err := json.Marshal(s)
-			if err != nil {
-				log.Println("ERROR readerJson json.Marshal", err)
-				res.error = "ERROR can't marshal JSON"
-				break
-			}
-			res.schema = string(bytes)
+		}
+
+		if msg.Action == ActionSet {
+
 		}
 
 		serverLog(msg, res)
@@ -92,7 +72,46 @@ func readerJson(conn *websocket.Conn) {
 		if err := conn.WriteJSON(res); err != nil {
 			log.Println(err)
 		}
+
 	}
+}
+
+func handleGetVolume(res *Result) {
+	audio := getVol()
+	res.response = strconv.FormatFloat(float64(audio.volume), 'f', -1, 32)
+}
+
+func handleGetMute(res *Result) {
+	audio := getVol()
+	res.response = strconv.FormatBool(audio.mute)
+}
+
+func handleGetCards(res *Result) {
+	cards, err := getCards()
+	if err != nil {
+		log.Println("ERROR readerJson GetCards", err)
+		res.error = "ERROR can't get cards information from the system"
+	}
+	b, err := json.Marshal(cards)
+	if err != nil {
+		log.Println("ERROR readerJson json.Marshal", err)
+		res.error = "ERROR can't pull cards information"
+	}
+	res.response = string(b)
+}
+
+func handleGetOutputs(res *Result) {
+	outputs, err := getOutputs()
+	if err != nil {
+		log.Println("ERROR readerJson getOutputs", err)
+		res.error = "ERROR can't get outputs information from the system"
+	}
+	b, err := json.Marshal(outputs)
+	if err != nil {
+		log.Println("ERROR readerJson json.Marshal", err)
+		res.error = "ERROR can't pull outputs information"
+	}
+	res.response = string(b)
 }
 
 func serverLog(msg Request, res Result) {
