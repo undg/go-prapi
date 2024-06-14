@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func readerJson(conn *websocket.Conn) {
+func readerJSON(conn *websocket.Conn) {
 	for {
 		msg := Request{}
 		res := Response{}
@@ -139,5 +139,5 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	go readerJson(ws)
+	go readerJSON(ws)
 }
