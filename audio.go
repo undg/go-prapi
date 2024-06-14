@@ -59,6 +59,11 @@ func clientVolume(c pulseaudio.Client) float32 {
 	return volume
 }
 
+type Audio struct {
+	volume float32
+	mute   bool
+}
+
 func setVol(vol float32) Audio {
 	c := clientOpen()
 
