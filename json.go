@@ -2,41 +2,53 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 )
 
-type Audio struct {
-	volume float32
-	mute   bool
+const (
+	ActionGet = "get"
+	ActionSet = "set"
+
+	TypeCards   = "cards"
+	TypeOutputs = "outputs"
+	TypeVol     = "vol"
+	TypeSchema  = "schema"
+	TypeMute    = "mute"
+	TypeToggle  = "toggle"
+)
+
+type Request struct {
+	Action string      `json:"action" doc:"Action to perform: get or set"`
+	Type   string      `json:"type" doc:"Type of the action: cards, outputs, vol, schema, mute, toggle"`
+	Value  interface{} `json:"value,omitempty" doc:"Optional value for set actions"`
 }
 
-type Result struct {
-	Audio
-	schema   string
-	response string
-	error    string
+type Response struct {
+	Action string      `json:"action" doc:"Action performed"`
+	Type   string      `json:"type" doc:"Type of the action"`
+	Status int16       `json:"status" doc:"Status code"`
+	Value  interface{} `json:"value" doc:"Resulting value"`
+	Error  string      `json:"error,omitempty" doc:"Error message"`
 }
 
-func marshalResult(a Result) []byte {
-	jsonData, err := json.Marshal(map[string]interface{}{
-		"schema":   a.schema,
-		"response": a.response,
-		"error":    a.error,
-	})
+const (
+	StatusSuccess int16 = 1000
+	StatusError   int16 = 1001
+)
 
-	if err != nil {
-		log.Println(err)
+func (r Response) MarshalJSON() ([]byte, error) {
+	data := map[string]interface{}{
+		"action": r.Action,
+		"status": r.Status,
+		"type":   r.Type,
 	}
 
-	return jsonData
-}
+	if r.Value != nil {
+		data["value"] = r.Value
+	}
 
-func (a Result) MarshalJSON() ([]byte, error) {
-	jsonData, err := json.Marshal(map[string]interface{}{
-		"schema":   a.schema,
-		"response": a.response,
-		"error":    a.error,
-	})
+	if r.Error != "" {
+		data["error"] = r.Error
+	}
 
-	return jsonData, err
+	return json.Marshal(data)
 }

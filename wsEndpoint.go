@@ -10,37 +10,10 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type Request struct {
-	Action string      `json:"action" doc:"Action to perform: get or set"`
-	Type   string      `json:"type" doc:"Type of the action: cards, outputs, vol, schema, mute, toggle"`
-	Value  interface{} `json:"value,omitempty" doc:"Optional value for set actions"`
-}
-
-type Response struct {
-	Action string      `json:"action" doc:"Action performed"`
-	Type   string      `json:"type" doc:"Type of the action"`
-	Value  interface{} `json:"value,omitempty" doc:"Resulting value"`
-}
-
-const (
-	ActionGet = "get"
-	ActionSet = "set"
-
-	TypeCards   = "cards"
-	TypeOutputs = "outputs"
-	TypeVol     = "vol"
-	TypeSchema  = "schema"
-	TypeMute    = "mute"
-	TypeToggle  = "toggle"
-)
-
-type GetRequest = string
-type SetRequest = string
-
 func readerJson(conn *websocket.Conn) {
 	for {
 		msg := Request{}
-		res := Result{}
+		res := Response{}
 
 		if err := conn.ReadJSON(&msg); err != nil {
 			log.Println("ERROR conn.ReadJSON", err)
@@ -64,7 +37,10 @@ func readerJson(conn *websocket.Conn) {
 		}
 
 		if msg.Action == ActionSet {
-
+			switch msg.Type {
+			case TypeVol:
+				handleSetVolume(&res, msg.Value.(float32))
+			}
 		}
 
 		serverLog(msg, res)
@@ -76,51 +52,70 @@ func readerJson(conn *websocket.Conn) {
 	}
 }
 
-func handleGetVolume(res *Result) {
-	audio := getVol()
-	res.response = strconv.FormatFloat(float64(audio.volume), 'f', -1, 32)
+func handleSetVolume(res *Response, vol float32) {
+	audio := setVol(vol)
+	res.Value = strconv.FormatFloat(float64(audio.volume), 'f', -1, 32)
+	res.Status = StatusSuccess
 }
 
-func handleGetMute(res *Result) {
+func handleGetVolume(res *Response) {
 	audio := getVol()
-	res.response = strconv.FormatBool(audio.mute)
+	res.Value = strconv.FormatFloat(float64(audio.volume), 'f', -1, 32)
+	res.Status = StatusSuccess
 }
 
-func handleGetCards(res *Result) {
+func handleGetMute(res *Response) {
+	audio := getVol()
+	res.Value = strconv.FormatBool(audio.mute)
+	res.Status = StatusSuccess
+}
+
+func handleGetCards(res *Response) {
 	cards, err := getCards()
 	if err != nil {
 		log.Println("ERROR readerJson GetCards", err)
-		res.error = "ERROR can't get cards information from the system"
+		res.Error = "ERROR can't get cards information from the system"
+		res.Status = StatusError
 	}
 	b, err := json.Marshal(cards)
 	if err != nil {
 		log.Println("ERROR readerJson json.Marshal", err)
-		res.error = "ERROR can't pull cards information"
+		res.Error = "ERROR can't pull cards information"
+		res.Status = StatusError
 	}
-	res.response = string(b)
+	res.Value = string(b)
+	res.Status = StatusSuccess
 }
 
-func handleGetOutputs(res *Result) {
+func handleGetOutputs(res *Response) {
 	outputs, err := getOutputs()
 	if err != nil {
 		log.Println("ERROR readerJson getOutputs", err)
-		res.error = "ERROR can't get outputs information from the system"
+		res.Error = "ERROR can't get outputs information from the system"
+		res.Status = StatusError
 	}
 	b, err := json.Marshal(outputs)
 	if err != nil {
 		log.Println("ERROR readerJson json.Marshal", err)
-		res.error = "ERROR can't pull outputs information"
+		res.Error = "ERROR can't pull outputs information"
+		res.Status = StatusError
 	}
-	res.response = string(b)
+	res.Value = string(b)
+	res.Status = StatusSuccess
 }
 
-func serverLog(msg Request, res Result) {
-	bytes, err := json.MarshalIndent(msg, "", "	")
+func serverLog(msg Request, res Response) {
+	msgBytes, err := json.MarshalIndent(msg, "", "	")
 	if err != nil {
-		log.Println("ERROR readerJson json.MarshalIndent", err)
+		log.Println("ERROR serverLog json.MarshalIndent", err)
 	}
-	fmt.Println("request:", string(bytes))
-	fmt.Println("response:", string(marshalResult(res)))
+	fmt.Println("request:", string(msgBytes))
+
+	resBytes, err := res.MarshalJSON()
+	if err != nil {
+		log.Println("ERROR serverLog res.MarshalJson", err)
+	}
+	fmt.Println("response:", string(resBytes))
 }
 
 var upgrader = websocket.Upgrader{
