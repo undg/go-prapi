@@ -59,16 +59,6 @@ func clientVolume(c pulseaudio.Client) float32 {
 	return volume
 }
 
-func getVol() Audio {
-	c := clientOpen()
-
-	volume := clientVolume(c)
-	mute := clientMuteStatus(c)
-
-	clientClose(c)
-	return Audio{volume, mute}
-}
-
 func setVol(vol float32) Audio {
 	c := clientOpen()
 
@@ -115,6 +105,16 @@ func mute(isMuted bool) Audio {
 type CardInfo struct {
 	Name  string
 	Index uint32
+}
+
+func getVol() Audio {
+	c := clientOpen()
+
+	volume := clientVolume(c)
+	mute := clientMuteStatus(c)
+
+	clientClose(c)
+	return Audio{volume, mute}
 }
 
 func getCards() ([]CardInfo, error) {
