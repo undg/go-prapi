@@ -19,4 +19,4 @@ You can use client like `wscat` to communicate with server:
 
 API is very unstable and still very incomplete.
 
-Check `Request` struct `wsEndpoint.go` to figure out how it works. For now I'm not generating jsonschema.
+Check `json.go` to figure out request and response JSON. No jsonschema for now.
