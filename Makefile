@@ -20,11 +20,6 @@ confirm:
 no-dirty:
 	git diff --exit-code
 
-RELEASE_TYPE ?= patch
-LATEST_TAG ?= $(git ls-remote -q --tags --sort=-v:refname | head -n1 | awk '{ print $2 }' | sed 's/refs\/tags\///g')
-LATEST_SHA ?= $(git rev-parse origin/main)
-NEW_TAG ?= $(docker run -it --rm alpine/semver semver -c -i $(RELEASE_TYPE) $(LATEST_TAG))
-
 # ==================================================================================== #
 # QUALITY CONTROL
 # ==================================================================================== #
@@ -98,8 +93,16 @@ push: tidy audit no-dirty
 ## bump: bump version and push to the remote Git repository
 .PHONY: bump
 bump:
-	git tag "v$(NEW_TAG)" $(LATEST_SHA)
-	git push origin "v$(NEW_TAG)"
+	RELEASE_TYPE=patch
+	LATEST_TAG=$(shell git ls-remote -q --tags --sort=-v:refname | head -n1 | awk '{ print $$2 }' | sed 's/refs\/tags\///g')
+	LATEST_SHA=$(shell git rev-parse origin/main)
+	NEW_TAG=$(shell semver -c -i $(RELEASE_TYPE) $(LATEST_TAG))
+
+	@echo $(LATEST_TAG)
+	@echo $(LATEST_SHA)
+	@echo $(NEW_TAG)
+	# git tag "v$(NEW_TAG)" $(LATEST_SHA)
+	# git push origin "v$(NEW_TAG)"
 
 ## production/deploy: deploy the application to production
 .PHONY: production/deploy
