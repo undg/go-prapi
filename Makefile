@@ -51,7 +51,7 @@ test:
 	go test -v -race -buildvcs ./...
 
 ## test/watch: run all tests in watch mode
-.PHONY: test/watch
+.PHONY: test/live
 test/watch:
 	./test-watch.sh
 
