@@ -1,6 +1,13 @@
 # This is an example .goreleaser.yml file with some sensible defaultsod tidy
     # you may remove this if you don't need go generate
     # - go generate ./...
+before:
+  hooks:
+    - make tidy
+    - apt install 
+
+    # you may remove this if you don't need go generate
+    # - go generate ./...
 builds:
   - env:
       - CGO_ENABLED=0
