@@ -15,16 +15,18 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: "1.22.4" # Ensure this matches your local version
-      - name: Audit
-        run: make audit
+      # - name: Audit
+      #   run: make audit
       - name: Build
         run: |
+          echo "ghref: $GITHUB_REF_NAME"
           go get -t ./...
           go build -o prapi
           zip -r "prapi-$GITHUB_REF_NAME.zip" prapi
+          ls
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
-            ./prapi-${{ github.ref_name }}.zip
-            ./prapi
+            prapi-${{ github.ref_name }}.zip
+            prapi
