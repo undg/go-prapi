@@ -15,19 +15,16 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: "1.22.4" # Ensure this matches your local version
-
-      # - name: Run staticcheck
-      #   run: go run honnef.co/go/tools/cmd/staticcheck@latest -checks=all,-ST1000,-U1000 ./... --debug.version
       - name: Audit
         run: make audit
       - name: Build
         run: |
           go get -t ./...
           go build -o prapi
-          zip -r "/tmp/bin/prapi-$GITHUB_REF_NAME.zip" prapi
+          zip -r "prapi-$GITHUB_REF_NAME.zip" prapi
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            /tmp/bin/prapi-${{ github.ref_name }}.zip
-            /tmp/bin/prapi
+            ./prapi-${{ github.ref_name }}.zip
+            ./prapi
