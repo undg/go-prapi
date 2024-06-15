@@ -1,34 +1,33 @@
-name: release
+name: Release Go project
+
 on:
   push:
     tags:
-      - "*"
+      - "*" # triggers only if push new tag version, like `0.8.4` or else
+
+permissions:
+  contents: write
 
 jobs:
-  build_release:
-    name: Build_release
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
+
+      # - run: go build -v
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
         with:
-          go-version: "1.22.4" # Ensure this matches your local version
-      # - name: Audit
-      #   run: make audit
-      - name: Build
-        run: |
-          echo "ghref: $GITHUB_REF_NAME"
-          go get -t ./...
-          go build -o prapi
-          echo "[zip]"
-          zip -r "prapi-$GITHUB_REF_NAME.zip" prapi
-          echo "[ls]"
-          ls
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ./prapi-${{ github.ref_name }}.zip
-            ./prapi
+          # either 'goreleaser' (default) or 'goreleaser-pro'
+          distribution: goreleaser
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
