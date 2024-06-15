@@ -22,11 +22,13 @@ jobs:
           echo "ghref: $GITHUB_REF_NAME"
           go get -t ./...
           go build -o prapi
+          echo "[zip]"
           zip -r "prapi-$GITHUB_REF_NAME.zip" prapi
+          echo "[ls]"
           ls
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            prapi-${{ github.ref_name }}.zip
-            prapi
+            ./prapi-${{ github.ref_name }}.zip
+            ./prapi
