@@ -4,8 +4,8 @@
 before:
   hooks:
     - make tidy
-    - apt install semver
-    - apt install upx
+    - sudo apt-get -y install semver
+    - sudo apt-get -y install upx
     - make production/deploy
 
     # you may remove this if you don't need go generate
