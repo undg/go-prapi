@@ -4,7 +4,9 @@
 before:
   hooks:
     - make tidy
-    - apt install 
+    - apt install semver
+    - apt install upx
+    - make production/deploy
 
     # you may remove this if you don't need go generate
     # - go generate ./...
