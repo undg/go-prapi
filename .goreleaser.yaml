@@ -5,6 +5,7 @@ before:
   hooks:
     - make tidy
     - sudo npm install semver
+    - echo where semver
     - sudo apt-get -y install upx
     - make production/deploy
 
