@@ -50,7 +50,7 @@ test:
 	go test -v -race -buildvcs ./...
 
 ## test/watch: run all tests in watch mode
-.PHONY: test/live
+.PHONY: test/watch
 test/watch:
 	./test-watch.sh
 
@@ -71,9 +71,9 @@ build:
 run: build
 	/tmp/bin/${BINARY_NAME}
 
-## run/live: run the application with reloading on file changes
-.PHONY: run/live
-run/live:
+## run/watch: run the application with reloading on file changes
+.PHONY: run/watch
+run/watch:
 	go run github.com/cosmtrek/air@v1.43.0 \
 		--build.cmd "make build" --build.bin "/tmp/bin/${BINARY_NAME}" --build.delay "100" \
 		--build.exclude_dir "" \
