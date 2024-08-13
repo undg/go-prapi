@@ -52,7 +52,7 @@ test:
 ## test/watch: run all tests in watch mode
 .PHONY: test/watch
 test/watch:
-	./test-watch.sh
+	./scripts/test-watch.sh
 
 ## test/cover: run all tests and display coverage
 .PHONY: test/cover
@@ -92,7 +92,7 @@ push: tidy audit no-dirty
 
 .PHONY: bump
 bump:
-	./bump.sh
+	./scripts/bump.sh
 
 ## production/deploy: deploy the application to production
 .PHONY: production/deploy
