@@ -1,3 +1,7 @@
+# go-prapi
+
+## Backend
+
 This is one of the backed implementations for [pulse-remote](https://github.com/undg/pulse-remote) written in go.
 It's utilise websockets for back and forward communication.
 
@@ -20,3 +24,12 @@ You can use client like `wscat` to communicate with server:
 API is very unstable and still very incomplete.
 
 Check `json.go` to figure out request and response JSON. No jsonschema for now.
+
+## Frontend
+Create or symlink `build-fe` folder to serve it with light webserver.
+
+
+For example if you have [pr-vite](https://github.com/undg/pr-vite) repo next to this one
+```bash
+ln -s ../pr-vite/dist build-fe
+```
