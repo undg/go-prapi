@@ -1,2 +1,4 @@
-build-fe/
+build-fe/*
+!build-fe/.gitkeep
 tmp/
+
