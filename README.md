@@ -27,10 +27,10 @@ Check `json.go` to figure out request and response JSON. No jsonschema for now.
 
 ## Frontend
 
-Create or symlink `build-fe` folder to serve it with light webserver.
+Create or symlink `frontend` folder to serve it with light webserver.
 
-For example if you have [pr-vite](https://github.com/undg/pr-vite) repo next to this one
+For example if you have [pr-web](https://github.com/undg/pr-web) repo next to this one
 
 ```bash
-ln -s ../pr-web/dist build-fe
+ln -s ../pr-web/dist frontend
 ```
