@@ -19,8 +19,8 @@ func setupRoutes(mux *http.ServeMux) {
 			http.NotFound(w, r)
 		}
 	})
-	fs := http.FileServer(http.Dir("./build-fe"))
-	mux.Handle("/web/", fs)
+	fs := http.FileServer(http.Dir("./frontend"))
+	mux.Handle("/", fs)
 }
 
 func main() {
