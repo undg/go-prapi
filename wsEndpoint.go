@@ -6,11 +6,17 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
 
+var stopTicker = make(chan struct{})
+
 func readerJSON(conn *websocket.Conn) {
+
+	defer close(stopTicker)
+
 	for {
 		msg := Request{}
 		res := Response{}
@@ -43,10 +49,16 @@ func readerJSON(conn *websocket.Conn) {
 			}
 		}
 
-		serverLog(msg, res)
+		serverLog(&msg, &res)
 
 		if err := conn.WriteJSON(res); err != nil {
 			log.Println(err)
+		}
+
+		select {
+		case <-stopTicker:
+			return
+		default:
 		}
 
 	}
@@ -62,6 +74,8 @@ func handleGetVolume(res *Response) {
 	audio := getVol()
 	res.Value = strconv.FormatFloat(float64(audio.volume), 'f', -1, 32)
 	res.Status = StatusSuccess
+
+	serverLog(nil, res)
 }
 
 func handleGetMute(res *Response) {
@@ -104,12 +118,14 @@ func handleGetOutputs(res *Response) {
 	res.Status = StatusSuccess
 }
 
-func serverLog(msg Request, res Response) {
-	msgBytes, err := json.MarshalIndent(msg, "", "	")
-	if err != nil {
-		log.Println("ERROR serverLog json.MarshalIndent", err)
+func serverLog(msg *Request, res *Response) {
+	if msg != nil {
+		msgBytes, err := json.MarshalIndent(msg, "", "	")
+		if err != nil {
+			log.Println("ERROR serverLog json.MarshalIndent", err)
+		}
+		fmt.Println("request:", string(msgBytes))
 	}
-	fmt.Println("request:", string(msgBytes))
 
 	resBytes, err := res.MarshalJSON()
 	if err != nil {
@@ -140,4 +156,19 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	go readerJSON(ws)
+
+	go tickerVolume(stopTicker)
+}
+
+func tickerVolume(stop <-chan struct{}) {
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			handleGetVolume(&Response{})
+		case <-stop:
+			return
+		}
+	}
 }
