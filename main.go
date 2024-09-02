@@ -20,19 +20,7 @@ func setupRoutes(mux *http.ServeMux) {
 		}
 	})
 	fs := http.FileServer(http.Dir("./build-fe"))
-	mux.Handle("/", fs)
-}
-
-func serveWeb() {
-	fmt.Println("Starting WEB server")
-	fs := http.FileServer(http.Dir("./build-fe"))
-	http.Handle("/", fs)
-
-	log.Println("Listening on http://localhost:", PORT)
-	err := http.ListenAndServe(PORT, nil)
-	if err != nil {
-		log.Fatal("ERROR ", err)
-	}
+	mux.Handle("/web/", fs)
 }
 
 func main() {
