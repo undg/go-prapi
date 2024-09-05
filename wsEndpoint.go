@@ -6,16 +6,24 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
 
-var stopTicker = make(chan struct{})
+var (
+	once       sync.Once
+	stopTicker = make(chan struct{})
+)
 
 func readerJSON(conn *websocket.Conn) {
 
-	defer close(stopTicker)
+	defer func() {
+		once.Do(func() {
+			close(stopTicker)
+		})
+	}()
 
 	for {
 		msg := Request{}
