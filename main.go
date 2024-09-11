@@ -14,7 +14,7 @@ func setupRoutes(mux *http.ServeMux) {
 		case "/api/":
 			apiDoc(w, r)
 		case "/api/v1/ws":
-			wsEndpoint(w, r)
+			HandleWebSocket(w, r)
 		default:
 			http.NotFound(w, r)
 		}

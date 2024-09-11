@@ -18,12 +18,12 @@ var (
 
 func readerJSON(conn *websocket.Conn) {
 
-	defer func() {
-		conn.Close()
-		once.Do(func() {
-			close(stopTicker)
-		})
-	}()
+	// defer func() {
+	// 	// conn.Close()
+	// 	once.Do(func() {
+	// 		close(stopTicker)
+	// 	})
+	// }()
 
 	for {
 		msg := Message{}
@@ -69,11 +69,11 @@ func readerJSON(conn *websocket.Conn) {
 			break
 		}
 
-		select {
-		case <-stopTicker:
-			return
-		default:
-		}
+		// select {
+		// case <-stopTicker:
+		// 	return
+		// default:
+		// }
 	}
 }
 
@@ -90,29 +90,6 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-func wsEndpoint(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("wsEndpoint visited by:", r.Host, r.RemoteAddr)
-
-	upgrader.CheckOrigin = func(r *http.Request) bool {
-		switch {
-		case r.Host == "localhost"+PORT:
-			return true
-		default:
-			return false
-		}
-	}
-
-	ws, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println(err)
-	}
-
-	go tickerVolume(stopTicker)
-
-	go readerJSON(ws)
-
-}
-
 func tickerVolume(stop <-chan struct{}) {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
@@ -125,3 +102,28 @@ func tickerVolume(stop <-chan struct{}) {
 		}
 	}
 }
+
+func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("wsEndpoint visited by:", r.Host, r.RemoteAddr)
+
+	// upgrader.CheckOrigin = func(r *http.Request) bool {
+	// 	switch {
+	// 	case r.Host == "localhost"+PORT:
+	// 		return true
+	// 	default:
+	// 		return false
+	// 	}
+	// }
+
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	defer conn.Close()
+
+	readerJSON(conn)
+
+	// tickerVolume(stopTicker)
+}
+
