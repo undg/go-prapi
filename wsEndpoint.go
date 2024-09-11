@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -47,7 +48,12 @@ func readerJSON(conn *websocket.Conn) {
 			handleGetMute(&res)
 		case SetMute:
 			handleSetVolume(&res, msg.Value.(float32))
+		default:
+			res.Error = "Command not found. Available actions: " + strings.Join(actionsToStrings(availableCommands), " ")
+			res.Status = StatusError
 		}
+
+		res.Action = string(msg.Action)
 
 		handleServerLog(&msg, &res)
 
@@ -62,6 +68,14 @@ func readerJSON(conn *websocket.Conn) {
 		default:
 		}
 	}
+}
+
+func actionsToStrings(actions []Action) []string {
+	strs := make([]string, len(actions))
+	for i, action := range actions {
+		strs[i] = string(action)
+	}
+	return strs
 }
 
 var upgrader = websocket.Upgrader{

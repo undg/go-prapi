@@ -4,19 +4,9 @@ import (
 	"encoding/json"
 )
 
-// @TODO (undg) 2024-09-11: fiddle with Request and Message and decide the wichone is better.
+type Action string
+
 const (
-	// Request Actions and Types
-	ActionGet = "get"
-	ActionSet = "set"
-
-	TypeCards   = "cards"
-	TypeOutputs = "outputs"
-	TypeVol     = "vol"
-	TypeSchema  = "schema"
-	TypeMute    = "mute"
-	TypeToggle  = "toggle"
-
 	// Message Actions
 	GetCards   Action = "GetCards"
 	GetOutputs Action = "GetOutputs"
@@ -29,14 +19,17 @@ const (
 	ToggleMute Action = "ToggleMute"
 )
 
+var availableCommands = []Action{
+	GetCards,
+	GetOutputs,
+	GetVolume,
+	GetSchema,
+	GetMute,
 
-type Request struct {
-	Action string      `json:"action" doc:"Action to perform: get or set"`
-	Type   string      `json:"type" doc:"Type of the action: cards, outputs, vol, schema, mute, toggle"`
-	Value  interface{} `json:"value,omitempty" doc:"Optional value for set actions"`
+	SetVolume,
+	SetMute,
+	ToggleMute,
 }
-
-type Action string
 
 // Message is an request from the client
 type Message struct {
@@ -46,7 +39,6 @@ type Message struct {
 
 type Response struct {
 	Action string      `json:"action" doc:"Action performed"`
-	Type   string      `json:"type" doc:"Type of the action"`
 	Status int16       `json:"status" doc:"Status code"`
 	Value  interface{} `json:"value" doc:"Resulting value"`
 	Error  string      `json:"error,omitempty" doc:"Error message"`
@@ -61,7 +53,6 @@ func (r Response) MarshalJSON() ([]byte, error) {
 	data := map[string]interface{}{
 		"action": r.Action,
 		"status": r.Status,
-		"type":   r.Type,
 	}
 
 	if r.Value != nil {
