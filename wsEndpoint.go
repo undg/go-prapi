@@ -1,11 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"sync"
 	"time"
 
@@ -20,6 +18,7 @@ var (
 func readerJSON(conn *websocket.Conn) {
 
 	defer func() {
+		conn.Close()
 		once.Do(func() {
 			close(stopTicker)
 		})
@@ -57,10 +56,11 @@ func readerJSON(conn *websocket.Conn) {
 			}
 		}
 
-		serverLog(&msg, &res)
+		handleServerLog(&msg, &res)
 
 		if err := conn.WriteJSON(res); err != nil {
 			log.Println(err)
+			break
 		}
 
 		select {
@@ -68,78 +68,7 @@ func readerJSON(conn *websocket.Conn) {
 			return
 		default:
 		}
-
 	}
-}
-
-func handleSetVolume(res *Response, vol float32) {
-	audio := setVol(vol)
-	res.Value = strconv.FormatFloat(float64(audio.volume), 'f', -1, 32)
-	res.Status = StatusSuccess
-}
-
-func handleGetVolume(res *Response) {
-	audio := getVol()
-	res.Value = strconv.FormatFloat(float64(audio.volume), 'f', -1, 32)
-	res.Status = StatusSuccess
-
-	serverLog(nil, res)
-}
-
-func handleGetMute(res *Response) {
-	audio := getVol()
-	res.Value = strconv.FormatBool(audio.mute)
-	res.Status = StatusSuccess
-}
-
-func handleGetCards(res *Response) {
-	cards, err := getCards()
-	if err != nil {
-		log.Println("ERROR readerJson GetCards", err)
-		res.Error = "ERROR can't get cards information from the system"
-		res.Status = StatusError
-	}
-	b, err := json.Marshal(cards)
-	if err != nil {
-		log.Println("ERROR readerJson json.Marshal", err)
-		res.Error = "ERROR can't pull cards information"
-		res.Status = StatusError
-	}
-	res.Value = string(b)
-	res.Status = StatusSuccess
-}
-
-func handleGetOutputs(res *Response) {
-	outputs, err := getOutputs()
-	if err != nil {
-		log.Println("ERROR readerJson getOutputs", err)
-		res.Error = "ERROR can't get outputs information from the system"
-		res.Status = StatusError
-	}
-	b, err := json.Marshal(outputs)
-	if err != nil {
-		log.Println("ERROR readerJson json.Marshal", err)
-		res.Error = "ERROR can't pull outputs information"
-		res.Status = StatusError
-	}
-	res.Value = string(b)
-	res.Status = StatusSuccess
-}
-
-func serverLog(msg *Request, res *Response) {
-	if msg != nil {
-		msgBytes, err := json.MarshalIndent(msg, "", "	")
-		if err != nil {
-			log.Println("ERROR serverLog json.MarshalIndent", err)
-		}
-		fmt.Println("request:", string(msgBytes))
-	}
-
-	resBytes, err := res.MarshalJSON()
-	if err != nil {
-		log.Println("ERROR serverLog res.MarshalJson", err)
-	}
-	fmt.Println("response:", string(resBytes))
 }
 
 var upgrader = websocket.Upgrader{
@@ -163,9 +92,11 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	go readerJSON(ws)
 
 	go tickerVolume(stopTicker)
+
+	go readerJSON(ws)
+
 }
 
 func tickerVolume(stop <-chan struct{}) {
