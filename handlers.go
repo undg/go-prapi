@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func handleServerLog(msg *Request, res *Response) {
+func handleServerLog(msg *Message, res *Response) {
 	if msg != nil {
 		msgBytes, err := json.MarshalIndent(msg, "", "	")
 		if err != nil {

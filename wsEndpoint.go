@@ -25,7 +25,7 @@ func readerJSON(conn *websocket.Conn) {
 	}()
 
 	for {
-		msg := Request{}
+		msg := Message{}
 		res := Response{}
 
 		if err := conn.ReadJSON(&msg); err != nil {
@@ -33,27 +33,20 @@ func readerJSON(conn *websocket.Conn) {
 			return
 		}
 
-		if msg.Action == ActionGet {
-			switch msg.Type {
-			case TypeCards:
-				handleGetCards(&res)
+		switch msg.Action {
+		case GetCards:
+			handleGetCards(&res)
 
-			case TypeOutputs:
-				handleGetOutputs(&res)
+		case GetOutputs:
+			handleGetOutputs(&res)
 
-			case TypeVol:
-				handleGetVolume(&res)
+		case GetVolume:
+			handleGetVolume(&res)
 
-			case TypeMute:
-				handleGetMute(&res)
-			}
-		}
-
-		if msg.Action == ActionSet {
-			switch msg.Type {
-			case TypeVol:
-				handleSetVolume(&res, msg.Value.(float32))
-			}
+		case GetMute:
+			handleGetMute(&res)
+		case SetMute:
+			handleSetVolume(&res, msg.Value.(float32))
 		}
 
 		handleServerLog(&msg, &res)

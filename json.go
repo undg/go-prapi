@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 )
 
+// @TODO (undg) 2024-09-11: fiddle with Request and Message and decide the wichone is better.
 const (
+	// Request Actions and Types
 	ActionGet = "get"
 	ActionSet = "set"
 
@@ -14,11 +16,31 @@ const (
 	TypeSchema  = "schema"
 	TypeMute    = "mute"
 	TypeToggle  = "toggle"
+
+	// Message Actions
+	GetCards   Action = "GetCards"
+	GetOutputs Action = "GetOutputs"
+	GetVolume  Action = "GetVolume"
+	GetSchema  Action = "GetSchema"
+	GetMute    Action = "GetMute"
+
+	SetVolume  Action = "SetVolume"
+	SetMute    Action = "SetMute"
+	ToggleMute Action = "ToggleMute"
 )
+
 
 type Request struct {
 	Action string      `json:"action" doc:"Action to perform: get or set"`
 	Type   string      `json:"type" doc:"Type of the action: cards, outputs, vol, schema, mute, toggle"`
+	Value  interface{} `json:"value,omitempty" doc:"Optional value for set actions"`
+}
+
+type Action string
+
+// Message is an request from the client
+type Message struct {
+	Action Action      `json:"action" doc:"Action to perform fe. GetVolume, SetVolume, SetMute..."`
 	Value  interface{} `json:"value,omitempty" doc:"Optional value for set actions"`
 }
 
