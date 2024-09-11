@@ -46,11 +46,18 @@ func readerJSON(conn *websocket.Conn) {
 
 		case GetMute:
 			handleGetMute(&res)
-		case SetMute:
-			handleSetVolume(&res, msg.Value.(float32))
+		case SetVolume:
+			value, ok := msg.Value.(float64)
+			if !ok {
+				res.Error = "Value is not a float"
+				res.Status = StatusValueError
+				break
+			}
+			res.Status = StatusSuccess
+			res.Value = setVol(float32(value))
 		default:
 			res.Error = "Command not found. Available actions: " + strings.Join(actionsToStrings(availableCommands), " ")
-			res.Status = StatusError
+			res.Status = StatusActionError
 		}
 
 		res.Action = string(msg.Action)

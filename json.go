@@ -47,6 +47,8 @@ type Response struct {
 const (
 	StatusSuccess int16 = 1000
 	StatusError   int16 = 1001
+	StatusActionError   int16 = 1002
+	StatusValueError   int16 = 1003
 )
 
 func (r Response) MarshalJSON() ([]byte, error) {
