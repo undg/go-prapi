@@ -7,26 +7,24 @@ import (
 
 func TestMarshalJSON(t *testing.T) {
 	response := Response{
-		Action: "get",
-		Type:   "cards",
+		Action: string(GetCards),
 		Status: StatusSuccess,
 		Value:  "test value",
 	}
 
-	expected := `{"action":"get","status":1000,"type":"cards","value":"test value"}`
+	expected := `{"action":"GetCards","status":1000,"value":"test value"}`
 
 	assertJSON(t, response, expected)
 }
 
 func TestMarshalJSONWithError(t *testing.T) {
 	response := Response{
-		Action: "get",
-		Type:   "cards",
+		Action: string(GetCards),
 		Status: StatusError,
 		Error:  "test error",
 	}
 
-	expected := `{"action":"get","error":"test error","status":1001,"type":"cards"}`
+	expected := `{"action":"GetCards","error":"test error","status":1001}`
 
 	assertJSON(t, response, expected)
 }
