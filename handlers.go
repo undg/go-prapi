@@ -23,24 +23,19 @@ func handleServerLog(msg *Message, res *Response) {
 	fmt.Println("response:", string(resBytes))
 }
 
-func handleSetVolume(res *Response, vol float32) {
-	audio := setVol(vol)
-	res.Value = strconv.FormatFloat(float64(audio.volume), 'f', -1, 32)
-	res.Status = StatusSuccess
+func handleSetVolume(res *Response, vol float64) {
+	audioValue := setVol(float32(vol))
+	res.Value = audioValue.volume
 }
 
 func handleGetVolume(res *Response) {
 	audio := getVol()
 	res.Value = strconv.FormatFloat(float64(audio.volume), 'f', -1, 32)
-	res.Status = StatusSuccess
-
-	handleServerLog(nil, res)
 }
 
 func handleGetMute(res *Response) {
 	audio := getVol()
 	res.Value = strconv.FormatBool(audio.mute)
-	res.Status = StatusSuccess
 }
 
 func handleGetCards(res *Response) {
@@ -57,7 +52,6 @@ func handleGetCards(res *Response) {
 		res.Status = StatusError
 	}
 	res.Value = string(b)
-	res.Status = StatusSuccess
 }
 
 func handleGetOutputs(res *Response) {
@@ -74,5 +68,4 @@ func handleGetOutputs(res *Response) {
 		res.Status = StatusError
 	}
 	res.Value = string(b)
-	res.Status = StatusSuccess
 }

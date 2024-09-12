@@ -11,6 +11,11 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+
 var (
 	once             sync.Once
 	globalStopTicker = make(chan struct{})
@@ -52,9 +57,12 @@ func readerJSON(conn *websocket.Conn, stopTicker chan struct{}) {
 		msg := Message{}
 		res := Response{}
 
+		res.Status = StatusSuccess
+
 		if err := conn.ReadJSON(&msg); err != nil {
 			log.Println("ERROR conn.ReadJSON", err)
-			return
+			res.Status = StatusErrorInvalidJSON
+			res.Error = "Invalid JSON"
 		}
 
 		switch msg.Action {
@@ -69,15 +77,10 @@ func readerJSON(conn *websocket.Conn, stopTicker chan struct{}) {
 
 		case GetMute:
 			handleGetMute(&res)
+
 		case SetVolume:
-			value, ok := msg.Value.(float64)
-			if !ok {
-				res.Error = "Value is not a float"
-				res.Status = StatusValueError
-				break
-			}
-			res.Status = StatusSuccess
-			res.Value = setVol(float32(value))
+			handleSetVolume(&res, msg.Value.(float64))
+
 		default:
 			res.Error = "Command not found. Available actions: " + strings.Join(actionsToStrings(availableCommands), " ")
 			res.Status = StatusActionError
@@ -100,18 +103,6 @@ func readerJSON(conn *websocket.Conn, stopTicker chan struct{}) {
 	}
 }
 
-func actionsToStrings(actions []Action) []string {
-	strs := make([]string, len(actions))
-	for i, action := range actions {
-		strs[i] = string(action)
-	}
-	return strs
-}
-
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
 
 func tickerVolume(stop <-chan struct{}) {
 	ticker := time.NewTicker(1 * time.Second)

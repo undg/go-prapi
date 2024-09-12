@@ -33,22 +33,29 @@ var availableCommands = []Action{
 
 // Message is an request from the client
 type Message struct {
+	// Actions listed in availableCommands slice
 	Action Action      `json:"action" doc:"Action to perform fe. GetVolume, SetVolume, SetMute..."`
-	Value  interface{} `json:"value,omitempty" doc:"Optional value for set actions"`
+	// Paylod send with Set* actions if necessary
+	Value  interface{} `json:"value,omitempty" doc:"Paylod send with Set* actions if necessary"`
 }
 
 type Response struct {
-	Action string      `json:"action" doc:"Action performed"`
+	// Action performed by API
+	Action string      `json:"actionIn" doc:"Action performed by API"`
+	// Status code
 	Status int16       `json:"status" doc:"Status code"`
-	Value  interface{} `json:"value" doc:"Resulting value"`
-	Error  string      `json:"error,omitempty" doc:"Error message"`
+	// Response payload
+	Value  interface{} `json:"value" doc:"Response payload"`
+	// Error description if any
+	Error  string      `json:"error,omitempty" doc:"Error description if any"`
 }
 
 const (
-	StatusSuccess int16 = 1000
-	StatusError   int16 = 1001
-	StatusActionError   int16 = 1002
-	StatusValueError   int16 = 1003
+	StatusSuccess          int16 = 4000
+	StatusError            int16 = 4001
+	StatusActionError      int16 = 4002
+	StatusValueError       int16 = 4003
+	StatusErrorInvalidJSON int16 = 4004
 )
 
 func (r Response) MarshalJSON() ([]byte, error) {

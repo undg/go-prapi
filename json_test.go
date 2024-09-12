@@ -12,7 +12,7 @@ func TestMarshalJSON(t *testing.T) {
 		Value:  "test value",
 	}
 
-	expected := `{"action":"GetCards","status":1000,"value":"test value"}`
+	expected := `{"action":"GetCards","status":4000,"value":"test value"}`
 
 	assertJSON(t, response, expected)
 }
@@ -24,7 +24,7 @@ func TestMarshalJSONWithError(t *testing.T) {
 		Error:  "test error",
 	}
 
-	expected := `{"action":"GetCards","error":"test error","status":1001}`
+	expected := `{"action":"GetCards","error":"test error","status":4001}`
 
 	assertJSON(t, response, expected)
 }
