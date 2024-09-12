@@ -12,18 +12,41 @@ import (
 )
 
 var (
-	once       sync.Once
-	stopTicker = make(chan struct{})
+	once             sync.Once
+	globalStopTicker = make(chan struct{})
 )
 
-func readerJSON(conn *websocket.Conn) {
+func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("wsEndpoint visited by:", r.Host, r.RemoteAddr)
 
-	// defer func() {
-	// 	// conn.Close()
-	// 	once.Do(func() {
-	// 		close(stopTicker)
-	// 	})
-	// }()
+	upgrader.CheckOrigin = func(r *http.Request) bool {
+		switch {
+		case r.Host == "localhost"+PORT:
+			return true
+		default:
+			return false
+		}
+	}
+
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	stopTicker := make(chan struct{})
+
+	defer func() {
+		conn.Close()
+		close(stopTicker)
+	}()
+
+	go readerJSON(conn, stopTicker)
+
+	// Wait for the connection to close
+	<-stopTicker
+}
+
+func readerJSON(conn *websocket.Conn, stopTicker chan struct{}) {
 
 	for {
 		msg := Message{}
@@ -69,11 +92,11 @@ func readerJSON(conn *websocket.Conn) {
 			break
 		}
 
-		// select {
-		// case <-stopTicker:
-		// 	return
-		// default:
-		// }
+		select {
+		case <-stopTicker:
+			return
+		default:
+		}
 	}
 }
 
@@ -102,28 +125,3 @@ func tickerVolume(stop <-chan struct{}) {
 		}
 	}
 }
-
-func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("wsEndpoint visited by:", r.Host, r.RemoteAddr)
-
-	// upgrader.CheckOrigin = func(r *http.Request) bool {
-	// 	switch {
-	// 	case r.Host == "localhost"+PORT:
-	// 		return true
-	// 	default:
-	// 		return false
-	// 	}
-	// }
-
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println(err)
-	}
-
-	defer conn.Close()
-
-	readerJSON(conn)
-
-	// tickerVolume(stopTicker)
-}
-
