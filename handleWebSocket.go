@@ -5,8 +5,6 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"sync"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -15,11 +13,6 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
-
-var (
-	once             sync.Once
-	globalStopTicker = make(chan struct{})
-)
 
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("wsEndpoint visited by:", r.Host, r.RemoteAddr)
@@ -81,6 +74,9 @@ func readerJSON(conn *websocket.Conn, stopTicker chan struct{}) {
 		case SetVolume:
 			handleSetVolume(&res, msg.Value.(float64))
 
+		case GetSchema:
+			handleGetSchema(&res)
+
 		default:
 			res.Error = "Command not found. Available actions: " + strings.Join(actionsToStrings(availableCommands), " ")
 			res.Status = StatusActionError
@@ -99,19 +95,6 @@ func readerJSON(conn *websocket.Conn, stopTicker chan struct{}) {
 		case <-stopTicker:
 			return
 		default:
-		}
-	}
-}
-
-func tickerVolume(stop <-chan struct{}) {
-	ticker := time.NewTicker(1 * time.Second)
-	defer ticker.Stop()
-	for {
-		select {
-		case <-ticker.C:
-			handleGetVolume(&Response{})
-		case <-stop:
-			return
 		}
 	}
 }

@@ -8,19 +8,20 @@ import (
 )
 
 func handleServerLog(msg *Message, res *Response) {
+	log.Println("")
 	if msg != nil {
 		msgBytes, err := json.MarshalIndent(msg, "", "	")
 		if err != nil {
-			log.Println("ERROR serverLog json.MarshalIndent", err)
+			log.Printf("ERROR serverLog json.MarshalIndent %s", err)
 		}
-		fmt.Println("request:", string(msgBytes))
+		log.Printf("Client message: %s", string(msgBytes))
 	}
 
 	resBytes, err := res.MarshalJSON()
 	if err != nil {
-		log.Println("ERROR serverLog res.MarshalJson", err)
+		log.Printf("ERROR serverLog res.MarshalJson %s", err)
 	}
-	fmt.Println("response:", string(resBytes))
+	fmt.Printf("response: %s", string(resBytes))
 }
 
 func handleSetVolume(res *Response, vol float64) {
@@ -41,13 +42,13 @@ func handleGetMute(res *Response) {
 func handleGetCards(res *Response) {
 	cards, err := getCards()
 	if err != nil {
-		log.Println("ERROR readerJson GetCards", err)
+		log.Printf("ERROR readerJson GetCards %s", err)
 		res.Error = "ERROR can't get cards information from the system"
 		res.Status = StatusError
 	}
 	b, err := json.Marshal(cards)
 	if err != nil {
-		log.Println("ERROR readerJson json.Marshal", err)
+		log.Printf("ERROR readerJson json.Marshal %s", err)
 		res.Error = "ERROR can't pull cards information"
 		res.Status = StatusError
 	}
@@ -57,15 +58,20 @@ func handleGetCards(res *Response) {
 func handleGetOutputs(res *Response) {
 	outputs, err := getOutputs()
 	if err != nil {
-		log.Println("ERROR readerJson getOutputs", err)
+		log.Printf("ERROR readerJson getOutputs %s", err)
 		res.Error = "ERROR can't get outputs information from the system"
 		res.Status = StatusError
 	}
 	b, err := json.Marshal(outputs)
 	if err != nil {
-		log.Println("ERROR readerJson json.Marshal", err)
+		log.Printf("ERROR readerJson json.Marshal %s", err)
 		res.Error = "ERROR can't pull outputs information"
 		res.Status = StatusError
 	}
 	res.Value = string(b)
+}
+
+func handleGetSchema(res *Response) {
+	schema := GetSchemaJSON()
+	res.Value = schema
 }

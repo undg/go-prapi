@@ -11,8 +11,8 @@ const PORT = ":8448"
 func setupRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/api/":
-			apiDoc(w, r)
+		case "/api":
+			RenderSchemaJSON(w, r)
 		case "/api/v1/ws":
 			HandleWebSocket(w, r)
 		default:
