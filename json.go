@@ -34,20 +34,20 @@ var availableCommands = []Action{
 // Message is an request from the client
 type Message struct {
 	// Actions listed in availableCommands slice
-	Action Action      `json:"action" doc:"Action to perform fe. GetVolume, SetVolume, SetMute..."`
+	Action Action `json:"action" doc:"Action to perform fe. GetVolume, SetVolume, SetMute..."`
 	// Paylod send with Set* actions if necessary
-	Value  interface{} `json:"value,omitempty" doc:"Paylod send with Set* actions if necessary"`
+	Value interface{} `json:"value,omitempty" doc:"Paylod send with Set* actions if necessary"`
 }
 
 type Response struct {
 	// Action performed by API
-	Action string      `json:"actionIn" doc:"Action performed by API"`
+	Action string `json:"actionIn" doc:"Action performed by API"`
 	// Status code
-	Status int16       `json:"status" doc:"Status code"`
+	Status int16 `json:"status" doc:"Status code"`
 	// Response payload
-	Value  interface{} `json:"value" doc:"Response payload"`
+	Value interface{} `json:"value" doc:"Response payload"`
 	// Error description if any
-	Error  string      `json:"error,omitempty" doc:"Error description if any"`
+	Error string `json:"error,omitempty" doc:"Error description if any"`
 }
 
 const (

@@ -7,4 +7,3 @@ func actionsToStrings(actions []Action) []string {
 	}
 	return strs
 }
-

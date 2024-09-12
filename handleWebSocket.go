@@ -103,7 +103,6 @@ func readerJSON(conn *websocket.Conn, stopTicker chan struct{}) {
 	}
 }
 
-
 func tickerVolume(stop <-chan struct{}) {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
