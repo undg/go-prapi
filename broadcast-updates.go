@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+var prevRes Response
+
 func broadcastUpdates() {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
@@ -25,7 +27,15 @@ func broadcastUpdates() {
 		res := Response{
 			Action: string(GetVolume),
 		}
+
+		// @TODO (undg) 2024-09-13: Replace with rich data about all sinks and cards.
 		handleGetVolume(&res)
+
+		if res == prevRes {
+			continue
+		}
+
+		prevRes = res
 
 		clientsMutex.Lock()
 		updatedClients := 0
