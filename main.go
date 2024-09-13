@@ -14,7 +14,7 @@ const PORT = ":8448"
 var clients = make(map[*websocket.Conn]bool)
 var clientsMutex = &sync.Mutex{}
 
-func setupRoutes(mux *http.ServeMux) {
+func startServer(mux *http.ServeMux) {
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/api":
@@ -32,7 +32,8 @@ func setupRoutes(mux *http.ServeMux) {
 func main() {
 	fmt.Println("Listening on http://localhost" + PORT)
 	mux := http.NewServeMux()
-	setupRoutes(mux)
+
+	startServer(mux)
 
 	go broadcastUpdates()
 

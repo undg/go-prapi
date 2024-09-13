@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net"
 	"net/http"
 	"strings"
 
@@ -17,21 +16,7 @@ var upgrader = websocket.Upgrader{
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	log.Printf("wsEndpoint visited by: %s %s", r.Host, r.RemoteAddr)
 
-	upgrader.CheckOrigin = func(r *http.Request) bool {
-		host, _, err := net.SplitHostPort(r.RemoteAddr)
-		if err != nil {
-			log.Printf("Error splitting host and port: %v", err)
-			return false
-		}
-
-		ip := net.ParseIP(host)
-		if ip == nil {
-			log.Printf("Invalid IP: %s", host)
-			return false
-		}
-
-		return IsLocalIP(ip) || strings.HasPrefix(r.Host, "localhost")
-	}
+	upgraderCheckOrigin()
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {

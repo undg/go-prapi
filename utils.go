@@ -1,6 +1,11 @@
 package main
 
-import "net"
+import (
+	"log"
+	"net"
+	"net/http"
+	"strings"
+)
 
 func actionsToStrings(actions []Action) []string {
 	strs := make([]string, len(actions))
@@ -28,3 +33,22 @@ func IsLocalIP(ip net.IP) bool {
 
 	return false
 }
+
+func upgraderCheckOrigin() {
+	upgrader.CheckOrigin = func(r *http.Request) bool {
+		host, _, err := net.SplitHostPort(r.RemoteAddr)
+		if err != nil {
+			log.Printf("Error splitting host and port: %v", err)
+			return false
+		}
+
+		ip := net.ParseIP(host)
+		if ip == nil {
+			log.Printf("Invalid IP: %s", host)
+			return false
+		}
+
+		return IsLocalIP(ip) || strings.HasPrefix(r.Host, "localhost")
+	}
+}
+
