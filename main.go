@@ -31,7 +31,9 @@ func startServer(mux *http.ServeMux) {
 }
 
 func main() {
-	fmt.Println("Listening on http://localhost" + PORT)
+	ip := getLocalIP()
+
+	fmt.Println("Listening on ws://" + ip + PORT)
 	mux := http.NewServeMux()
 
 	startServer(mux)
