@@ -8,27 +8,31 @@ type Action string
 
 const (
 	// Message Actions
-	GetCards   Action = "GetCards"
-	GetOutputs Action = "GetOutputs"
-	GetVolume  Action = "GetVolume"
-	GetSchema  Action = "GetSchema"
-	GetMute    Action = "GetMute"
+	ActionGetCards   Action = "GetCards"
+	ActionGetOutputs Action = "GetOutputs"
+	ActionGetVolume  Action = "GetVolume"
+	ActionGetSchema  Action = "GetSchema"
+	ActionGetMute    Action = "GetMute"
 
-	SetVolume  Action = "SetVolume"
-	SetMute    Action = "SetMute"
-	ToggleMute Action = "ToggleMute"
+	ActionSetVolume  Action = "SetVolume"
+	ActionSetMute    Action = "SetMute"
+	ActionToggleMute Action = "ToggleMute"
+
+	ActionImAlive Action = "ImAlive"
 )
 
 var availableCommands = []Action{
-	GetCards,
-	GetOutputs,
-	GetVolume,
-	GetSchema,
-	GetMute,
+	ActionGetCards,
+	ActionGetOutputs,
+	ActionGetVolume,
+	ActionGetSchema,
+	ActionGetMute,
 
-	SetVolume,
-	SetMute,
-	ToggleMute,
+	ActionSetVolume,
+	ActionSetMute,
+	ActionToggleMute,
+
+	ActionImAlive,
 }
 
 // Message is an request from the client
@@ -41,7 +45,7 @@ type Message struct {
 
 type Response struct {
 	// Action performed by API
-	Action string `json:"actionIn" doc:"Action performed by API"`
+	Action string `json:"action" doc:"Action performed by API"`
 	// Status code
 	Status int16 `json:"status" doc:"Status code"`
 	// Response payload

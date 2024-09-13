@@ -7,7 +7,7 @@ import (
 
 func TestMarshalJSON(t *testing.T) {
 	response := Response{
-		Action: string(GetCards),
+		Action: string(ActionGetCards),
 		Status: StatusSuccess,
 		Value:  "test value",
 	}
@@ -19,7 +19,7 @@ func TestMarshalJSON(t *testing.T) {
 
 func TestMarshalJSONWithError(t *testing.T) {
 	response := Response{
-		Action: string(GetCards),
+		Action: string(ActionGetCards),
 		Status: StatusError,
 		Error:  "test error",
 	}

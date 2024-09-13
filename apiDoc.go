@@ -93,6 +93,7 @@ func GetSchemaJSON() interface{} {
 					"SetVolume",
 					"SetMute",
 					"ToggleMute",
+					"ImAlive",
 				},
 			},
 			"Message": map[string]interface{}{

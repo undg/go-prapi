@@ -56,17 +56,17 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		}
 
 		switch msg.Action {
-		case GetVolume:
+		case ActionGetVolume:
 			handleGetVolume(&res)
-		case GetMute:
+		case ActionGetMute:
 			handleGetMute(&res)
-		case GetCards:
+		case ActionGetCards:
 			handleGetCards(&res)
-		case GetOutputs:
+		case ActionGetOutputs:
 			handleGetOutputs(&res)
-		case GetSchema:
+		case ActionGetSchema:
 			handleGetSchema(&res)
-		case SetVolume:
+		case ActionSetVolume:
 			handleSetVolume(&res, msg.Value.(float64))
 		default:
 			res.Error = "Command not found. Available actions: " + strings.Join(actionsToStrings(availableCommands), " ")
