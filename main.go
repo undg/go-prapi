@@ -4,9 +4,15 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
+
+	"github.com/gorilla/websocket"
 )
 
 const PORT = ":8448"
+
+var clients = make(map[*websocket.Conn]bool)
+var clientsMutex = &sync.Mutex{}
 
 func setupRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
@@ -27,6 +33,8 @@ func main() {
 	fmt.Println("Listening on http://localhost" + PORT)
 	mux := http.NewServeMux()
 	setupRoutes(mux)
+
+	go broadcastUpdates()
 
 	err := http.ListenAndServe(PORT, mux)
 	if err != nil {
