@@ -15,7 +15,10 @@ func broadcastUpdates() {
 		clientsMutex.Unlock()
 
 		if clientsCount == 0 {
-			log.Println("No clients connected. Skipping volume update.")
+			if DEBUG {
+				log.Println("No clients connected. Skipping volume update.")
+			}
+
 			continue
 		}
 

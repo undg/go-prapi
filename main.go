@@ -10,6 +10,7 @@ import (
 )
 
 const PORT = ":8448"
+const DEBUG = false
 
 var clients = make(map[*websocket.Conn]bool)
 var clientsMutex = &sync.Mutex{}
