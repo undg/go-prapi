@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"strings"
 
@@ -18,12 +19,17 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("wsEndpoint visited by:", r.Host, r.RemoteAddr)
 
 	upgrader.CheckOrigin = func(r *http.Request) bool {
-		switch {
-		case r.Host == "localhost"+PORT:
-			return true
-		default:
+		host, _, err := net.SplitHostPort(r.RemoteAddr)
+		if err != nil {
 			return false
 		}
+
+		ip := net.ParseIP(host)
+		if ip == nil {
+			return false
+		}
+
+		return isLocalIP(ip) || strings.HasPrefix(r.Host, "localhost")
 	}
 
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -31,21 +37,14 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	stopTicker := make(chan struct{})
-
 	defer func() {
 		conn.Close()
-		close(stopTicker)
 	}()
 
-	go readerJSON(conn, stopTicker)
-
-	// Wait for the connection to close
-	<-stopTicker
+	go readerJSON(conn)
 }
 
-func readerJSON(conn *websocket.Conn, stopTicker chan struct{}) {
-
+func readerJSON(conn *websocket.Conn) {
 	for {
 		msg := Message{}
 		res := Response{}
@@ -91,10 +90,24 @@ func readerJSON(conn *websocket.Conn, stopTicker chan struct{}) {
 			break
 		}
 
-		select {
-		case <-stopTicker:
-			return
-		default:
+	}
+}
+
+func isLocalIP(ip net.IP) bool {
+	if ip.IsLoopback() {
+		return true
+	}
+
+	if ip4 := ip.To4(); ip4 != nil {
+		switch {
+		case ip4[0] == 10:
+			return true
+		case ip4[0] == 172 && ip4[1] >= 16 && ip4[1] <= 31:
+			return true
+		case ip4[0] == 192 && ip4[1] == 168:
+			return true
 		}
 	}
+
+	return false
 }
