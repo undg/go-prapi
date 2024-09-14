@@ -8,7 +8,7 @@ import (
 var prevRes Response
 
 func broadcastUpdates() {
-	ticker := time.NewTicker(100 * time.Millisecond)
+	ticker := time.NewTicker(500 * time.Millisecond)
 	defer ticker.Stop()
 
 	for range ticker.C {
@@ -26,6 +26,7 @@ func broadcastUpdates() {
 
 		res := Response{
 			Action: string(ActionGetVolume),
+			Status: StatusSuccess,
 		}
 
 		// @TODO (undg) 2024-09-13: Replace with rich data about all sinks and cards.
@@ -75,6 +76,7 @@ func broadcastImAlive() {
 		res := Response{
 			Action: string(ActionImAlive),
 			Value: timeoutDuration,
+			Status: StatusSuccess,
 		}
 
 		clientsMutex.Lock()
