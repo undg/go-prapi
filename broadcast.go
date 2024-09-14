@@ -75,8 +75,8 @@ func broadcastImAlive() {
 
 		res := Response{
 			Action: string(ActionImAlive),
-			Value: timeoutDuration,
 			Status: StatusSuccess,
+			Value: int(timeoutDuration.Seconds()),
 		}
 
 		clientsMutex.Lock()
@@ -93,6 +93,6 @@ func broadcastImAlive() {
 		}
 		clientsMutex.Unlock()
 
-		log.Printf("Volume update sent to %d/%d clients. Time to next ALIVE update: %v", updatedClients, clientsCount, res.Value)
+		log.Printf("Volume update sent to %d/%d clients. Time to next ALIVE update: %vS", updatedClients, clientsCount, res.Value)
 	}
 }
