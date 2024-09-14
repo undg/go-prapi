@@ -43,7 +43,7 @@ func broadcastUpdates() {
 		for conn := range clients {
 			err := conn.WriteJSON(res)
 			if err != nil {
-				log.Printf("Error sending volume update to client: %v", err)
+				log.Printf("Error broadcast VOLUME update to client: %v", err)
 				conn.Close()
 				delete(clients, conn)
 			} else {
@@ -52,7 +52,7 @@ func broadcastUpdates() {
 		}
 		clientsMutex.Unlock()
 
-		log.Printf("Volume update sent to %d/%d clients. Value: %v", updatedClients, clientsCount, res.Value)
+		log.Printf("Volume broadcast sent to %d/%d clients. Value: %v", updatedClients, clientsCount, res.Value)
 	}
 }
 
@@ -67,7 +67,7 @@ func broadcastImAlive() {
 
 		if clientsCount == 0 {
 			if DEBUG {
-				log.Println("No clients connected. Skipping ALIVE update.")
+				log.Println("No clients connected. Skipping ALIVE ping.")
 			}
 
 			continue
@@ -85,14 +85,14 @@ func broadcastImAlive() {
 			err := conn.WriteJSON(res)
 			if err != nil {
 				log.Printf("Error sending alive status to client: %v", err)
-				conn.Close()
-				delete(clients, conn)
-			} else {
-				updatedClients++
+					conn.Close()
+					delete(clients, conn)
+				} else {
+					updatedClients++
+				}
 			}
-		}
-		clientsMutex.Unlock()
+			clientsMutex.Unlock()
 
-		log.Printf("Volume update sent to %d/%d clients. Time to next ALIVE update: %vS", updatedClients, clientsCount, res.Value)
-	}
+			log.Printf("Alive status sent to %d/%d clients. Next ping in %ds", updatedClients, clientsCount, res.Value)
+		}
 }
