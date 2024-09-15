@@ -26,6 +26,7 @@ func startServer(mux *http.ServeMux) {
 			http.NotFound(w, r)
 		}
 	})
+
 	fs := http.FileServer(http.Dir("./frontend"))
 	mux.Handle("/", fs)
 }
