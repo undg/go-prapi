@@ -1,6 +1,6 @@
 # go-prapi
 
-## Pulse Remote Frontend
+## Pulse Remote Backbend
 
 A simple and powerful PulseAudio Remote API for Linux systems.
 
