@@ -1,5 +1,7 @@
 # go-prapi
 
+## Pulse Remote Frontend
+
 A simple and powerful PulseAudio Remote API for Linux systems.
 
 ## What is this?
