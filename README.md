@@ -1,36 +1,55 @@
 # go-prapi
 
-## Backend
+A simple and powerful PulseAudio Remote API for Linux systems.
 
-This is one of the backed implementations for [pulse-remote](https://github.com/undg/pulse-remote) written in go.
-It's utilise websockets for back and forward communication.
+## What is this?
 
-To start the server, open terminal and run command:
+go-prapi is a backend implementation for [pulse-remote](https://github.com/undg/pulse-remote) written in Go. It provides a WebSocket-based API to control and gather information from PulseAudio devices and sinks.
 
-```bash
-make run
-```
+## Features
 
-Server will run on port 8448 in /ws endpoint
+- Works with Linux PulseAudio and PipeWire
+- WebSocket communication for real-time updates
+- Control volume, mute status, and audio outputs
+- Retrieve information about audio cards and sinks
 
-Check Makefile for other commands.
+## Quick Start
 
-You can use client like `wscat` to communicate with server:
-
-```bash
- wscat -c localhost:8448/ws
-```
-
-API is very unstable and still very incomplete.
-
-Check `json.go` to figure out request and response JSON. No jsonschema for now.
+1. Clone the repository
+2. Run the server:
+3. The server will start on `ws://localhost:8448/api/v1/ws`
 
 ## Frontend
 
-Create or symlink `frontend` folder to serve it with light webserver.
+An actively developed frontend for this API is available at [pr-web](https://github.com/undg/pr-web).
 
-For example if you have [pr-web](https://github.com/undg/pr-web) repo next to this one
+To use the frontend:
 
+1. Build the pr-web project
+2. Copy or symlink the build output to the `frontend` folder in this project
+
+Example (if pr-web is in a sibling directory):
 ```bash
 ln -s ../pr-web/dist frontend
 ```
+
+
+## API
+
+For detailed API documentation, connect to the WebSocket endpoint and send a `GetSchema` action.
+
+## Development
+
+Check the Makefile for available commands:
+
+- `make test`: Run tests
+- `make build`: Build the application
+- `make run/watch`: Run with auto-reload on file changes
+
+## License
+
+This project is licensed under the GNU General Public License v2.0.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
