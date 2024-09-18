@@ -85,11 +85,13 @@ func GetSchemaJSON() interface{} {
 			"Action": map[string]interface{}{
 				"type": "string",
 				"enum": []string{
+					"GetSinks",
 					"GetCards",
 					"GetOutputs",
 					"GetVolume",
 					"GetSchema",
 					"GetMute",
+					"SetSinks",
 					"SetVolume",
 					"SetMute",
 					"ToggleMute",

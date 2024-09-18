@@ -8,12 +8,14 @@ type Action string
 
 const (
 	// Message Actions
+	ActionGetSinks   Action = "GetSinks"
 	ActionGetCards   Action = "GetCards"
 	ActionGetOutputs Action = "GetOutputs"
 	ActionGetVolume  Action = "GetVolume"
 	ActionGetSchema  Action = "GetSchema"
 	ActionGetMute    Action = "GetMute"
 
+	ActionSetSink   Action = "SetSink"
 	ActionSetVolume  Action = "SetVolume"
 	ActionSetMute    Action = "SetMute"
 	ActionToggleMute Action = "ToggleMute"
@@ -22,12 +24,14 @@ const (
 )
 
 var availableCommands = []Action{
+	ActionGetSinks,
 	ActionGetCards,
 	ActionGetOutputs,
 	ActionGetVolume,
 	ActionGetSchema,
 	ActionGetMute,
 
+	ActionSetSink,
 	ActionSetVolume,
 	ActionSetMute,
 	ActionToggleMute,

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/websocket"
+	"github.com/undg/go-prapi/pactl"
 )
 
 var upgrader = websocket.Upgrader{
@@ -50,12 +51,27 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
+		// Same Action and StatusSuccess if everyting is OK
 		res := Response{
 			Action: string(msg.Action),
 			Status: StatusSuccess,
 		}
 
 		switch msg.Action {
+		case ActionGetSinks:
+			sinks, _ :=  pactl.GetSinks()
+			res.Value = sinks
+		case ActionSetSink:
+			if sinkInfo, ok := msg.Value.(map[string]interface{}); ok {
+				name, _ := sinkInfo["name"].(string)
+				volume, _ := sinkInfo["volume"].(string)
+				pactl.SetSink(name, volume)
+				sinks, _ := pactl.GetSinks()
+				res.Value = sinks
+			} else {
+				res.Error = "Invalid sink information format"
+				res.Status = StatusActionError
+			}
 		case ActionGetVolume:
 			handleGetVolume(&res)
 		case ActionGetMute:

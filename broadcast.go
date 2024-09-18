@@ -2,7 +2,10 @@ package main
 
 import (
 	"log"
+	"reflect"
 	"time"
+
+	"github.com/undg/go-prapi/pactl"
 )
 
 var prevRes Response
@@ -24,15 +27,17 @@ func broadcastUpdates() {
 			continue
 		}
 
+		// Same Action and StatusSuccess if everyting is OK
 		res := Response{
 			Action: string(ActionGetVolume),
 			Status: StatusSuccess,
 		}
 
-		// @TODO (undg) 2024-09-13: Replace with rich data about all sinks and cards.
-		handleGetVolume(&res)
+		sinks, _ := pactl.GetSinks()
+		res.Value = sinks
 
-		if res == prevRes {
+		equal := reflect.DeepEqual(res, prevRes)
+		if equal {
 			continue
 		}
 
