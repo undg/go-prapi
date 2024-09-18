@@ -40,7 +40,7 @@ func main() {
 	startServer(mux)
 
 	go broadcastUpdates()
-	go broadcastImAlive()
+	// go broadcastImAlive()
 
 	err := http.ListenAndServe(PORT, mux)
 	if err != nil {
