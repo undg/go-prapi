@@ -29,7 +29,7 @@ func broadcastUpdates() {
 
 		// Same Action and StatusSuccess if everyting is OK
 		res := Response{
-			Action: string(ActionGetVolume),
+			Action: string(ActionGetSinks),
 			Status: StatusSuccess,
 		}
 
