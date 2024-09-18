@@ -10,10 +10,10 @@ import (
 )
 
 type Sink struct {
-	Name   string
-	Label  string
-	Volume int
-	Muted  bool
+	Name   string `json:"name" doc:"The name of the sink"`
+	Label  string `json:"label" doc:"Human-readable label for the sink"`
+	Volume int    `json:"volume" doc:"Current volume level of the sink"`
+	Muted  bool   `json:"muted" doc:"Whether the sink is muted"`
 }
 
 func SetSink(sinkName string, volume string) {
