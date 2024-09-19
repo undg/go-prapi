@@ -15,7 +15,7 @@ const (
 	ActionGetSchema  Action = "GetSchema"
 	ActionGetMute    Action = "GetMute"
 
-	ActionSetSink   Action = "SetSink"
+	ActionSetSink    Action = "SetSink"
 	ActionSetVolume  Action = "SetVolume"
 	ActionSetMute    Action = "SetMute"
 	ActionToggleMute Action = "ToggleMute"
@@ -44,7 +44,7 @@ type Message struct {
 	// Actions listed in availableCommands slice
 	Action Action `json:"action" doc:"Action to perform fe. GetVolume, SetVolume, SetMute..."`
 	// Paylod send with Set* actions if necessary
-	Value interface{} `json:"value,omitempty" doc:"Paylod send with Set* actions if necessary"`
+	Payload interface{} `json:"payload,omitempty" doc:"Paylod send with Set* actions if necessary"`
 }
 
 type Response struct {
@@ -53,7 +53,7 @@ type Response struct {
 	// Status code
 	Status int16 `json:"status" doc:"Status code"`
 	// Response payload
-	Value interface{} `json:"value" doc:"Response payload"`
+	Payload interface{} `json:"payload" doc:"Response payload"`
 	// Error description if any
 	Error string `json:"error,omitempty" doc:"Error description if any"`
 }
@@ -62,7 +62,7 @@ const (
 	StatusSuccess          int16 = 4000
 	StatusError            int16 = 4001
 	StatusActionError      int16 = 4002
-	StatusValueError       int16 = 4003
+	StatusPayloadError     int16 = 4003
 	StatusErrorInvalidJSON int16 = 4004
 )
 
@@ -72,8 +72,8 @@ func (r Response) MarshalJSON() ([]byte, error) {
 		"status": r.Status,
 	}
 
-	if r.Value != nil {
-		data["value"] = r.Value
+	if r.Payload != nil {
+		data["payload"] = r.Payload
 	}
 
 	if r.Error != "" {

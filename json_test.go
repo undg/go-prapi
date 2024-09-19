@@ -9,10 +9,10 @@ func TestMarshalJSON(t *testing.T) {
 	response := Response{
 		Action: string(ActionGetCards),
 		Status: StatusSuccess,
-		Value:  "test value",
+		Payload:  "test payload",
 	}
 
-	expected := `{"action":"GetCards","status":4000,"value":"test value"}`
+	expected := `{"action":"GetCards","payload":"test payload","status":4000}`
 
 	assertJSON(t, response, expected)
 }
