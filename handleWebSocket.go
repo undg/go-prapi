@@ -32,6 +32,18 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("New client connected. Total clients: %d", clientCount)
 
+	// Execute ActionGetSinks when a new client connects
+	sinks, _ := pactl.GetSinks()
+	initialResponse := Response{
+		Action: string(ActionGetSinks),
+		Status: StatusSuccess,
+		Value:  sinks,
+	}
+	if err := conn.WriteJSON(initialResponse); err != nil {
+		log.Printf("Error sending initial sinks data: %v", err)
+	}
+
+	// Cleanup after client is disconnected
 	defer func() {
 		clientsMutex.Lock()
 		delete(clients, conn)
@@ -41,6 +53,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Client disconnected. Total clients: %d", clientCount)
 	}()
 
+	// Messaging system with client
 	for {
 		var msg Message
 		err := conn.ReadJSON(&msg)
