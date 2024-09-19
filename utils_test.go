@@ -2,8 +2,8 @@ package main
 
 import (
 	"net"
-	"testing"
 	"regexp"
+	"testing"
 )
 
 func TestIsLocalIP(t *testing.T) {
@@ -55,14 +55,14 @@ func TestIsLocalIP(t *testing.T) {
 }
 
 func TestGetLocalIP(t *testing.T) {
-    ip := getLocalIP()
-    if ip == "" {
-        t.Error("No IP found")
-    }
-    
-    ipPattern := `^(\d{1,3}\.){3}\d{1,3}$`
-    match, _ := regexp.MatchString(ipPattern, ip)
-    if !match {
-        t.Errorf("Invalid IP format: %s", ip)
-    }
+	ip := getLocalIP()
+	if ip == "" {
+		t.Error("No IP found")
+	}
+
+	ipPattern := `^(\d{1,3}\.){3}\d{1,3}$`
+	match, _ := regexp.MatchString(ipPattern, ip)
+	if !match {
+		t.Errorf("Invalid IP format: %s", ip)
+	}
 }
