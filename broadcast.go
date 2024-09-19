@@ -34,7 +34,7 @@ func broadcastUpdates() {
 		}
 
 		sinks, _ := pactl.GetSinks()
-		res.Value = sinks
+		res.Payload = sinks
 
 		equal := reflect.DeepEqual(res, prevRes)
 		if equal {
@@ -57,7 +57,7 @@ func broadcastUpdates() {
 		}
 		clientsMutex.Unlock()
 
-		log.Printf("Volume broadcast sent to %d/%d clients. Value: %v", updatedClients, clientsCount, res.Value)
+		log.Printf("Volume broadcast sent to %d/%d clients. Value: %v", updatedClients, clientsCount, res.Payload)
 	}
 }
 
@@ -81,7 +81,7 @@ func broadcastImAlive() {
 		res := Response{
 			Action: string(ActionImAlive),
 			Status: StatusSuccess,
-			Value: int(timeoutDuration.Seconds()),
+			Payload: int(timeoutDuration.Seconds()),
 		}
 
 		clientsMutex.Lock()
@@ -98,6 +98,6 @@ func broadcastImAlive() {
 			}
 			clientsMutex.Unlock()
 
-			log.Printf("Alive status sent to %d/%d clients. Next ping in %ds", updatedClients, clientsCount, res.Value)
+			log.Printf("Alive status sent to %d/%d clients. Next ping in %ds", updatedClients, clientsCount, res.Payload)
 		}
 }

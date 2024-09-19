@@ -37,7 +37,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	initialResponse := Response{
 		Action: string(ActionGetSinks),
 		Status: StatusSuccess,
-		Value:  sinks,
+		Payload:  sinks,
 	}
 	if err := conn.WriteJSON(initialResponse); err != nil {
 		log.Printf("Error sending initial sinks data: %v", err)
@@ -73,14 +73,14 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		switch msg.Action {
 		case ActionGetSinks:
 			sinks, _ :=  pactl.GetSinks()
-			res.Value = sinks
+			res.Payload = sinks
 		case ActionSetSink:
-			if sinkInfo, ok := msg.Value.(map[string]interface{}); ok {
+			if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
 				name, _ := sinkInfo["name"].(string)
 				volume, _ := sinkInfo["volume"].(string)
 				pactl.SetSink(name, volume)
 				sinks, _ := pactl.GetSinks()
-				res.Value = sinks
+				res.Payload = sinks
 			} else {
 				res.Error = "Invalid sink information format"
 				res.Status = StatusActionError
@@ -96,7 +96,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		case ActionGetSchema:
 			handleGetSchema(&res)
 		case ActionSetVolume:
-			handleSetVolume(&res, msg.Value.(float64))
+			handleSetVolume(&res, msg.Payload.(float64))
 		default:
 			res.Error = "Command not found. Available actions: " + strings.Join(actionsToStrings(availableCommands), " ")
 			res.Status = StatusActionError

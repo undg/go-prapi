@@ -26,25 +26,25 @@ func handleServerLog(msg *Message, res *Response) {
 
 func handleSetVolume(res *Response, vol float64) {
 	audioValue := setVol(float32(vol))
-	res.Value = audioValue.volume
+	res.Payload = audioValue.volume
 	if DEBUG {
-		log.Printf("handleSetVolume %s", res.Value)
+		log.Printf("handleSetVolume %s", res.Payload)
 	}
 }
 
 func handleGetVolume(res *Response) {
 	audio := getVol()
-	res.Value = strconv.FormatFloat(float64(audio.volume), 'f', -1, 32)
+	res.Payload = strconv.FormatFloat(float64(audio.volume), 'f', -1, 32)
 	if DEBUG {
-		log.Printf("handleGetVolume %s", res.Value)
+		log.Printf("handleGetVolume %s", res.Payload)
 	}
 }
 
 func handleGetMute(res *Response) {
 	audio := getVol()
-	res.Value = strconv.FormatBool(audio.mute)
+	res.Payload = strconv.FormatBool(audio.mute)
 	if DEBUG {
-		log.Printf("handleGetMute %s", res.Value)
+		log.Printf("handleGetMute %s", res.Payload)
 	}
 }
 
@@ -61,9 +61,9 @@ func handleGetCards(res *Response) {
 		res.Error = "ERROR can't pull cards information"
 		res.Status = StatusError
 	}
-	res.Value = string(b)
+	res.Payload = string(b)
 	if DEBUG {
-		log.Printf("handleGetCards %s", res.Value)
+		log.Printf("handleGetCards %s", res.Payload)
 	}
 }
 
@@ -80,16 +80,16 @@ func handleGetOutputs(res *Response) {
 		res.Error = "ERROR can't pull outputs information"
 		res.Status = StatusError
 	}
-	res.Value = string(b)
+	res.Payload = string(b)
 	if DEBUG {
-		log.Printf("handleGetOutputs %s", res.Value)
+		log.Printf("handleGetOutputs %s", res.Payload)
 	}
 }
 
 func handleGetSchema(res *Response) {
 	schema := GetSchemaJSON()
-	res.Value = schema
+	res.Payload = schema
 	if DEBUG {
-		log.Printf("handleGetSchema %s", res.Value)
+		log.Printf("handleGetSchema %s", res.Payload)
 	}
 }
