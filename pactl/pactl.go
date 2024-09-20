@@ -10,7 +10,8 @@ import (
 )
 
 type Sink struct {
-	Name   string `json:"name" doc:"The name of the sink"`
+	ID     string `json:"id" doc:"The id of the sink. Same  as name"`
+	Name   string `json:"name" doc:"The name of the sink. Same as id"`
 	Label  string `json:"label" doc:"Human-readable label for the sink"`
 	Volume int    `json:"volume" doc:"Current volume level of the sink"`
 	Muted  bool   `json:"muted" doc:"Whether the sink is muted"`
@@ -42,6 +43,7 @@ func GetSinks() ([]Sink, error) {
 
 		nameRe := regexp.MustCompile(`Name: (.+)`)
 		if match := nameRe.FindStringSubmatch(block); len(match) > 1 {
+			sink.ID = strings.TrimSpace(match[1])
 			sink.Name = strings.TrimSpace(match[1])
 		}
 
