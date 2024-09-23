@@ -10,6 +10,8 @@ import (
 
 var prevRes Response
 
+const writeWait = 10 * time.Second
+
 func broadcastUpdates() {
 	ticker := time.NewTicker(500 * time.Millisecond)
 	defer ticker.Stop()
@@ -46,6 +48,7 @@ func broadcastUpdates() {
 		clientsMutex.Lock()
 		updatedClients := 0
 		for conn := range clients {
+			conn.SetWriteDeadline(time.Now().Add(writeWait))
 			err := conn.WriteJSON(res)
 			if err != nil {
 				log.Printf("Error broadcast VOLUME update to client: %v", err)
