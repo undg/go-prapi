@@ -1,6 +1,6 @@
 package pactl
 
-type PactlSinksJSON []struct {
+type PactlSinkJSON struct {
 	ActivePort string `json:"active_port"`
 	Balance    int64  `json:"balance"`
 	BaseVolume struct {
@@ -70,7 +70,6 @@ type PactlSinksJSON []struct {
 		Device_class                     string `json:"device.class"`
 		Device_description               string `json:"device.description"`
 		Device_enum_api                  string `json:"device.enum.api"`
-		Device_formFactor                string `json:"device.form_factor"`
 		Device_iconName                  string `json:"device.icon_name"`
 		Device_id                        string `json:"device.id"`
 		Device_name                      string `json:"device.name"`

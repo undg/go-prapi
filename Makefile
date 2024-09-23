@@ -94,7 +94,7 @@ run/watch:
 .PHONY: typesgen
 typesgen: 
 	go install github.com/ChimeraCoder/gojson/gojson@latest
-	pactl --format=json list sinks | gojson -name=PactlSinksJSON -pkg=pactl > pactl/sinks-types.go
+	pactl --format=json list sinks | jq '.[0]' | gojson -name=PactlSinkJSON -pkg=pactl > pactl/sink-type.go
 
 ## push: push changes to the remote Git repository
 .PHONY: push
