@@ -24,7 +24,9 @@ jobs:
           # install and start pipewire
           sudo apt-get update
           sudo apt-get install -y pipewire pipewire-pulse
-          systemctl --user start pipewire pipewire-pulse
-          sleep 2 # Give time to start
+          # systemctl --user start pipewire pipewire-pulse
+          pipewire &
+          pipewire-pulse &
+          sleep 5 # Give time to start
           # run test
           make test
