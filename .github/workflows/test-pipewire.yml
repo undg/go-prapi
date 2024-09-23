@@ -1,0 +1,34 @@
+name: Test(pipewire)
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # - name: Setup upterm session
+      #   uses: lhotari/action-upterm@v1
+
+      - name: Test pipewire
+        run: |
+          # install and start pipewire
+          sudo apt-get update
+          sudo apt-get install -y pipewire pipewire-pulse pulseaudio-utils
+          pipewire &
+          pipewire-pulse &
+          sleep 2
+          # load virtual audio device
+          pactl load-module module-null-sink
+          # run test
+          make test
+
