@@ -90,6 +90,12 @@ run/watch:
 # OPERATIONS
 # ==================================================================================== #
 
+## typesgen: generate structs from json output
+.PHONY: typesgen
+typesgen: 
+	go install github.com/ChimeraCoder/gojson/gojson@latest
+	pactl --format=json list sinks | gojson -name=PactlSinksJSON -pkg=pactl > pactl/sinks-types.go
+
 ## push: push changes to the remote Git repository
 .PHONY: push
 push: tidy audit no-dirty
