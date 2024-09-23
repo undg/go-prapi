@@ -16,17 +16,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
-
       - name: Test pipewire
         run: |
           # install and start pipewire
           sudo apt-get update
-          sudo apt-get install -y pipewire pipewire-pulse
-          # systemctl --user start pipewire pipewire-pulse
-          pipewire &
-          pipewire-pulse &
-          sleep 5 # Give time to start
+          sudo apt-get install -y pipewire pulseaudio
+          systemctl --user start pipewire
+          pactl load-module module-null-sink
           # run test
           make test
+
