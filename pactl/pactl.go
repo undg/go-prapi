@@ -2,10 +2,11 @@ package pactl
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os/exec"
-	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -28,38 +29,42 @@ func SetSink(sinkName string, volume string) {
 
 }
 
+func adaptSink(ps PactlSinkJSON) (Sink) {
+	front_left, err := strconv.Atoi(strings.Trim(ps.Volume.Front_left.ValuePercent, "%"))
+	if err != nil {
+		log.Println("ERROR adaptSink, parse front_left to int", err)
+	}
+
+	front_right, err := strconv.Atoi(strings.Trim(ps.Volume.Front_left.ValuePercent, "%"))
+	if err != nil {
+		log.Println("ERROR adaptSink, parse front_right to int", err)
+	}
+
+	return Sink{
+		ID:     ps.Name,
+		Name:   ps.Name,
+		Label:  ps.Description,
+		Volume: (front_left + front_right) / 2,
+		Muted:  ps.Mute,
+	}
+}
+
 func GetSinks() ([]Sink, error) {
-	cmd := exec.Command("pactl", "list", "sinks")
+	cmd := exec.Command("pactl", "--format=json", "list", "sinks")
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
 
-	sinks := []Sink{}
-	sinkBlocks := strings.Split(string(output), "Sink #")
+	var pactlSinks []PactlSinkJSON
+	err = json.Unmarshal(output, &pactlSinks)
+	if err != nil {
+		log.Println("ERROR Unmarshal pactlSinks in GetSinks.", err)
+	}
 
-	for _, block := range sinkBlocks[1:] {
-		sink := Sink{}
-
-		nameRe := regexp.MustCompile(`Name: (.+)`)
-		if match := nameRe.FindStringSubmatch(block); len(match) > 1 {
-			sink.ID = strings.TrimSpace(match[1])
-			sink.Name = strings.TrimSpace(match[1])
-		}
-
-		volumeRe := regexp.MustCompile(`Volume:.*?(\d+)%`)
-		if match := volumeRe.FindStringSubmatch(block); len(match) > 1 {
-			fmt.Sscanf(match[1], "%d", &sink.Volume)
-		}
-
-		humanNameRe := regexp.MustCompile(`Description: (.+)`)
-		if match := humanNameRe.FindStringSubmatch(block); len(match) > 1 {
-			sink.Label = strings.TrimSpace(match[1])
-		}
-
-		sink.Muted = strings.Contains(block, "Mute: yes")
-
-		sinks = append(sinks, sink)
+	sinks := make([]Sink, len(pactlSinks))
+	for i, ps := range pactlSinks {
+		sinks[i] = adaptSink(ps)
 	}
 
 	return sinks, nil

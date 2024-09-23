@@ -2,7 +2,7 @@ package pactl
 
 type PactlSinkJSON struct {
 	ActivePort string `json:"active_port"`
-	Balance    int64  `json:"balance"`
+	Balance    float64  `json:"balance"`
 	BaseVolume struct {
 		DB           string `json:"db"`
 		Value        int64  `json:"value"`
@@ -15,8 +15,8 @@ type PactlSinkJSON struct {
 	Formats     []string `json:"formats"`
 	Index       int64    `json:"index"`
 	Latency     struct {
-		Actual     int64 `json:"actual"`
-		Configured int64 `json:"configured"`
+		Actual     float64 `json:"actual"`
+		Configured float64 `json:"configured"`
 	} `json:"latency"`
 	MonitorSource string `json:"monitor_source"`
 	Mute          bool   `json:"mute"`
