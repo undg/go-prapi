@@ -16,12 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install pactl
+      - name: Test pulseaudio
         run: |
+          # install and start pulseaudio
           sudo apt-get update 
-          sudo apt-get install -y pulseaudio pactl
-          pactl list sinks 
+          sudo apt-get install -y pulseaudio
+          pulseaudio --start
+          # run test
           make test
-
-      - name: Test
-        run: make test
