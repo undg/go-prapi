@@ -19,7 +19,7 @@ jobs:
       - name: Install pactl
         run: |
           sudo apt-get update
-          sudo apt-get install -y pipewire pipewire-pulse
+          sudo apt-get install -y pipewire pipewire-pulse pactl
           pactl list sinks 
           make test
 
