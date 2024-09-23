@@ -2,12 +2,12 @@ package pactl
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os/exec"
 	"strconv"
 	"strings"
+	 jsoniter "github.com/json-iterator/go"
 )
 
 type Sink struct {
@@ -57,6 +57,7 @@ func GetSinks() ([]Sink, error) {
 	}
 
 	var pactlSinks []PactlSinkJSON
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
 	err = json.Unmarshal(output, &pactlSinks)
 	if err != nil {
 		log.Println("ERROR Unmarshal pactlSinks in GetSinks.", err)
