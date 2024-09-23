@@ -7,9 +7,9 @@ import (
 
 func TestMarshalJSON(t *testing.T) {
 	response := Response{
-		Action: string(ActionGetCards),
-		Status: StatusSuccess,
-		Payload:  "test payload",
+		Action:  string(ActionGetCards),
+		Status:  StatusSuccess,
+		Payload: "test payload",
 	}
 
 	expected := `{"action":"GetCards","payload":"test payload","status":4000}`

@@ -35,9 +35,9 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	// Execute ActionGetSinks when a new client connects
 	sinks, _ := pactl.GetSinks()
 	initialResponse := Response{
-		Action: string(ActionGetSinks),
-		Status: StatusSuccess,
-		Payload:  sinks,
+		Action:  string(ActionGetSinks),
+		Status:  StatusSuccess,
+		Payload: sinks,
 	}
 	if err := conn.WriteJSON(initialResponse); err != nil {
 		log.Printf("Error sending initial sinks data: %v", err)
@@ -72,7 +72,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 		switch msg.Action {
 		case ActionGetSinks:
-			sinks, _ :=  pactl.GetSinks()
+			sinks, _ := pactl.GetSinks()
 			res.Payload = sinks
 		case ActionSetSink:
 			if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {

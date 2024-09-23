@@ -18,7 +18,7 @@ func TestGetSinks(t *testing.T) {
 	tests := []struct {
 		Name  string
 		Input string
-		Want      bool
+		Want  bool
 	}{
 		{"ValidSink", "alsa_output.pci-0000_0c_00.4.analog-stereo", true},
 		{"InvalidSink", "dupa", false},
