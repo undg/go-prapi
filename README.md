@@ -1,6 +1,11 @@
 # go-prapi
 
-## Pulse Remote Backbend
+![test Pipewire](https://github.com/github/docs/actions/workflows/test-pipewire.yml/badge.svg)
+![test PulseAudio](https://github.com/github/docs/actions/workflows/test-puleaudio.yml/badge.svg)
+![audit](https://github.com/github/docs/actions/workflows/audit.yml/badge.svg)
+![tidy](https://github.com/github/docs/actions/workflows/tidy.yml/badge.svg)
+
+## Pulse Remote Backend
 
 A simple and powerful PulseAudio Remote API for Linux systems.
 
