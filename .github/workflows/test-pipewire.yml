@@ -23,7 +23,7 @@ jobs:
         run: |
           # install and start pipewire
           sudo apt-get update
-          sudo apt-get install -y pipewire pipewire-pulse pulseaudio-utils #pulseaudio
+          sudo apt-get install -y pipewire pipewire-pulse pulseaudio-utils
           pipewire &
           pipewire-pulse &
           sleep 2
