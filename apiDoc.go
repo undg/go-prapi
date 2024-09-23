@@ -74,7 +74,7 @@ func RenderSchemaJSON(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, html, string(jsonData))
 }
 
-// GetSchemaJSON returns the JSON Schema for the API
+// GetSchema returns the JSON Schema for the API
 func GetSchemaJSON() interface{} {
 	schema := JSONSchema{
 		Schema:      "http://json-schema.org/draft-07/schema#",

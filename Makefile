@@ -30,15 +30,20 @@ tidy:
 	go fmt ./...
 	go mod tidy -v
 
+.PHONY: tidy/ci
+tidy/ci: tidy no-dirty
+
 ## audit: run quality control checks
-.PHONY: audit
+.PHONY: audit/ci
 audit:
 	go mod verify
 	go vet ./...
 	go run honnef.co/go/tools/cmd/staticcheck@latest -checks=all,-ST1000,-U1000 ./...
 	go run golang.org/x/vuln/cmd/govulncheck@latest ./...
-	go test -race -buildvcs -vet=off ./...
+	# go test -race -buildvcs -vet=off ./...
 
+.PHONY: audit
+audit/full: tidy audit/ci test
 
 # ==================================================================================== #
 # DEVELOPMENT
