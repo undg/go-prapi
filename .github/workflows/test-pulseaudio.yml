@@ -20,6 +20,8 @@ jobs:
         run: |
           sudo apt-get update 
           sudo apt-get install -y pulseaudio
+          pactl list sinks 
+          make test
 
       - name: Test
         run: make test
