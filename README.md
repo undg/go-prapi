@@ -1,7 +1,7 @@
 # go-prapi
 
 ![test Pipewire](https://github.com/undg/go-prapi/actions/workflows/test-pipewire.yml/badge.svg)
-![test PulseAudio](https://github.com/undg/go-prapi/actions/workflows/test-puleaudio.yml/badge.svg)
+![test PulseAudio](https://github.com/undg/go-prapi/actions/workflows/test-pulseaudio.yml/badge.svg)
 ![audit](https://github.com/undg/go-prapi/actions/workflows/audit.yml/badge.svg)
 ![tidy](https://github.com/undg/go-prapi/actions/workflows/tidy.yml/badge.svg)
 
