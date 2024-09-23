@@ -1,8 +1,8 @@
 package pactl
 
 type PactlSinkJSON struct {
-	ActivePort string `json:"active_port"`
-	Balance    float64  `json:"balance"`
+	ActivePort string  `json:"active_port"`
+	Balance    float64 `json:"balance"`
 	BaseVolume struct {
 		DB           string `json:"db"`
 		Value        int64  `json:"value"`
