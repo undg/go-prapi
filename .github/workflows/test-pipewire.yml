@@ -19,12 +19,12 @@ jobs:
       - name: Setup upterm session
         uses: lhotari/action-upterm@v1
 
-      - name: Install pactl
+      - name: Test pipewire
         run: |
+          # install and start pipewire
           sudo apt-get update
-          sudo apt-get install -y pipewire pipewire-pulse pactl
-          pactl list sinks 
+          sudo apt-get install -y pipewire pipewire-pulse
+          systemctl --user start pipewire pipewire-pulse
+          sleep 2 # Give time to start
+          # run test
           make test
-
-      - name: Test
-        run: make test
