@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/goccy/go-json"
 	gen "github.com/undg/go-prapi/pactl/generated"
 )
 
@@ -59,7 +59,6 @@ func GetSinks() ([]Sink, error) {
 	}
 
 	var pactlSinks []gen.PactlSinkJSON
-	var json = jsoniter.ConfigCompatibleWithStandardLibrary
 	err = json.Unmarshal(output, &pactlSinks)
 	if err != nil {
 		log.Println("ERROR Unmarshal pactlSinks in GetSinks.", err)
