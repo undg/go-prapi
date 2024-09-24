@@ -3,11 +3,13 @@ package pactl
 import (
 	"bufio"
 	"fmt"
-	jsoniter "github.com/json-iterator/go"
 	"log"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	jsoniter "github.com/json-iterator/go"
+	gen "github.com/undg/go-prapi/pactl/generated"
 )
 
 type Sink struct {
@@ -29,7 +31,7 @@ func SetSink(sinkName string, volume string) {
 
 }
 
-func adaptSink(ps PactlSinkJSON) Sink {
+func adaptSink(ps gen.PactlSinkJSON) Sink {
 	front_left, err := strconv.Atoi(strings.Trim(ps.Volume.Front_left.ValuePercent, "%"))
 	if err != nil {
 		log.Println("ERROR adaptSink, parse front_left to int", err)
@@ -56,7 +58,7 @@ func GetSinks() ([]Sink, error) {
 		return nil, err
 	}
 
-	var pactlSinks []PactlSinkJSON
+	var pactlSinks []gen.PactlSinkJSON
 	var json = jsoniter.ConfigCompatibleWithStandardLibrary
 	err = json.Unmarshal(output, &pactlSinks)
 	if err != nil {
