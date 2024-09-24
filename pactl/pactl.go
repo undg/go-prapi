@@ -32,12 +32,12 @@ func SetSink(sinkName string, volume string) {
 }
 
 func adaptSink(ps gen.PactlSinkJSON) Sink {
-	front_left, err := strconv.Atoi(strings.Trim(ps.Volume.Front_left.ValuePercent, "%"))
+	frontLeft, err := strconv.Atoi(strings.Trim(ps.Volume.FrontLeft.ValuePercent, "%"))
 	if err != nil {
 		log.Println("ERROR adaptSink, parse front_left to int", err)
 	}
 
-	front_right, err := strconv.Atoi(strings.Trim(ps.Volume.Front_left.ValuePercent, "%"))
+	frontRight, err := strconv.Atoi(strings.Trim(ps.Volume.FrontLeft.ValuePercent, "%"))
 	if err != nil {
 		log.Println("ERROR adaptSink, parse front_right to int", err)
 	}
@@ -46,7 +46,7 @@ func adaptSink(ps gen.PactlSinkJSON) Sink {
 		ID:     ps.Name,
 		Name:   ps.Name,
 		Label:  ps.Description,
-		Volume: (front_left + front_right) / 2,
+		Volume: (frontLeft + frontRight) / 2,
 		Muted:  ps.Mute,
 	}
 }
