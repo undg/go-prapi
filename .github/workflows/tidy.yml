@@ -20,5 +20,9 @@ jobs:
       - name: Set up Go
         uses: jdx/mise-action@v2
 
+      # Only for DEBUGING with remote shell
+      # - name: Setup upterm session
+      #   uses: lhotari/action-upterm@v1
+
       - name: Tidy
         run: make tidy/ci
