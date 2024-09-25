@@ -29,8 +29,8 @@ jobs:
           sudo apt-get update 
           sudo apt-get install -y pulseaudio
           pulseaudio --start
-          sleep 2
+          # sleep 10
           # load virtual audio device
-          pactl load-module module-null-sink
+          # pactl load-module module-null-sink
           # run test
           make test
