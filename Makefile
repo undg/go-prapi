@@ -124,9 +124,17 @@ typesgen: sink-type source-type tidy
 push: tidy audit no-dirty
 	git push
 
-.PHONY: bump
-bump:
-	./scripts/bump.sh
+.PHONY: bump/patch
+bump/patch:
+	./scripts/bump.sh patch
+
+.PHONY: bump/minor
+bump/minor:
+	./scripts/bump.sh minor
+
+.PHONY: bump/main
+bump/main:
+	./scripts/bump.sh main
 
 ## production/deploy: deploy the application to production
 .PHONY: production/deploy
