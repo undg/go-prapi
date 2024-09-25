@@ -10,6 +10,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  PULSE_SERVER: unix:/tmp/pulse-socket
+
 jobs:
   Test:
     runs-on: ubuntu-latest
@@ -17,8 +20,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: jdx/mise-action@v2
+      # - name: Set up Go
+      #   uses: jdx/mise-action@v2
 
       - name: Setup upterm session
         uses: lhotari/action-upterm@v1
