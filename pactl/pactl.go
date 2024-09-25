@@ -12,8 +12,8 @@ import (
 	gen "github.com/undg/go-prapi/pactl/generated"
 )
 
-type Sink struct {
-	ID     string `json:"id" doc:"The id of the sink. Same  as name"`
+type Output struct {
+	Id     int `json:"id" doc:"The id of the sink. Same  as name"`
 	Name   string `json:"name" doc:"The name of the sink. Same as id"`
 	Label  string `json:"label" doc:"Human-readable label for the sink"`
 	Volume int    `json:"volume" doc:"Current volume level of the sink"`
@@ -31,7 +31,7 @@ func SetSink(sinkName string, volume string) {
 
 }
 
-func adaptSink(ps gen.PactlSinkJSON) Sink {
+func adaptSink(ps gen.PactlSinkJSON) Output {
 	frontLeft, err := strconv.Atoi(strings.Trim(ps.Volume.FrontLeft.ValuePercent, "%"))
 	if err != nil {
 		log.Println("ERROR adaptSink, parse front_left to int", err)
@@ -42,8 +42,8 @@ func adaptSink(ps gen.PactlSinkJSON) Sink {
 		log.Println("ERROR adaptSink, parse front_right to int", err)
 	}
 
-	return Sink{
-		ID:     ps.Name,
+	return Output{
+		Id:     int(ps.Index),
 		Name:   ps.Name,
 		Label:  ps.Description,
 		Volume: (frontLeft + frontRight) / 2,
@@ -51,7 +51,7 @@ func adaptSink(ps gen.PactlSinkJSON) Sink {
 	}
 }
 
-func GetSinks() ([]Sink, error) {
+func GetSinks() ([]Output, error) {
 	cmd := exec.Command("pactl", "--format=json", "list", "sinks")
 	output, err := cmd.Output()
 	if err != nil {
@@ -64,7 +64,7 @@ func GetSinks() ([]Sink, error) {
 		log.Println("ERROR Unmarshal pactlSinks in GetSinks.", err)
 	}
 
-	sinks := make([]Sink, len(pactlSinks))
+	sinks := make([]Output, len(pactlSinks))
 	for i, ps := range pactlSinks {
 		sinks[i] = adaptSink(ps)
 	}
@@ -84,4 +84,20 @@ func ListenForChanges(callback func()) {
 			callback()
 		}
 	}
+}
+
+type Status = struct {
+	Outputs []Output `json:"outputs" doc:"List of output devices"`
+}
+
+func GetStatus() (Status, error) {
+	outputs, err := GetSinks()
+	if err != nil {
+		log.Println("ERROR GetStatus() GetSinks()", err)
+	}
+
+
+	return Status{
+		Outputs: outputs,
+	}, nil
 }

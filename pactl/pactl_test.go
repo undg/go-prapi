@@ -4,6 +4,14 @@ import (
 	"regexp"
 	"testing"
 )
+func TestGetStatus(t *testing.T) {
+	t.Run("Volume", func(t *testing.T) {
+		status, _ := GetStatus()
+		if status.Outputs == nil {
+			t.Errorf("Missing Outputs in Status struct")
+		}
+	})
+}
 
 func TestGetSinks(t *testing.T) {
 	t.Run("Volume", func(t *testing.T) {

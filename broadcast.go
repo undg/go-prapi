@@ -35,8 +35,11 @@ func broadcastUpdates() {
 			Status: StatusSuccess,
 		}
 
-		sinks, _ := pactl.GetSinks()
-		res.Payload = sinks
+		status, err := pactl.GetStatus()
+		if err != nil {
+			log.Println("ERROR pactl.GetStatus() in broadcastUpdates()", err)
+		}
+		res.Payload = status
 
 		equal := reflect.DeepEqual(res, prevRes)
 		if equal {
