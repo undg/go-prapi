@@ -10,9 +10,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  PULSE_SERVER: unix:/tmp/pulse-socket
-
 jobs:
   Test:
     runs-on: ubuntu-latest
