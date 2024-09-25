@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
-	"regexp"
+	"strconv"
 	"strings"
+
+	"github.com/goccy/go-json"
+	gen "github.com/undg/go-prapi/pactl/generated"
 )
 
 type Sink struct {
@@ -28,38 +31,42 @@ func SetSink(sinkName string, volume string) {
 
 }
 
+func adaptSink(ps gen.PactlSinkJSON) Sink {
+	frontLeft, err := strconv.Atoi(strings.Trim(ps.Volume.FrontLeft.ValuePercent, "%"))
+	if err != nil {
+		log.Println("ERROR adaptSink, parse front_left to int", err)
+	}
+
+	frontRight, err := strconv.Atoi(strings.Trim(ps.Volume.FrontLeft.ValuePercent, "%"))
+	if err != nil {
+		log.Println("ERROR adaptSink, parse front_right to int", err)
+	}
+
+	return Sink{
+		ID:     ps.Name,
+		Name:   ps.Name,
+		Label:  ps.Description,
+		Volume: (frontLeft + frontRight) / 2,
+		Muted:  ps.Mute,
+	}
+}
+
 func GetSinks() ([]Sink, error) {
-	cmd := exec.Command("pactl", "list", "sinks")
+	cmd := exec.Command("pactl", "--format=json", "list", "sinks")
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
 
-	sinks := []Sink{}
-	sinkBlocks := strings.Split(string(output), "Sink #")
+	var pactlSinks []gen.PactlSinkJSON
+	err = json.Unmarshal(output, &pactlSinks)
+	if err != nil {
+		log.Println("ERROR Unmarshal pactlSinks in GetSinks.", err)
+	}
 
-	for _, block := range sinkBlocks[1:] {
-		sink := Sink{}
-
-		nameRe := regexp.MustCompile(`Name: (.+)`)
-		if match := nameRe.FindStringSubmatch(block); len(match) > 1 {
-			sink.ID = strings.TrimSpace(match[1])
-			sink.Name = strings.TrimSpace(match[1])
-		}
-
-		volumeRe := regexp.MustCompile(`Volume:.*?(\d+)%`)
-		if match := volumeRe.FindStringSubmatch(block); len(match) > 1 {
-			fmt.Sscanf(match[1], "%d", &sink.Volume)
-		}
-
-		humanNameRe := regexp.MustCompile(`Description: (.+)`)
-		if match := humanNameRe.FindStringSubmatch(block); len(match) > 1 {
-			sink.Label = strings.TrimSpace(match[1])
-		}
-
-		sink.Muted = strings.Contains(block, "Mute: yes")
-
-		sinks = append(sinks, sink)
+	sinks := make([]Sink, len(pactlSinks))
+	for i, ps := range pactlSinks {
+		sinks[i] = adaptSink(ps)
 	}
 
 	return sinks, nil

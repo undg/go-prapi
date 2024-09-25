@@ -14,8 +14,13 @@ jobs:
   Test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      - name: Set up Go
+        uses: jdx/mise-action@v2
+
+      # Only for DEBUGING with remote shell
       # - name: Setup upterm session
       #   uses: lhotari/action-upterm@v1
 

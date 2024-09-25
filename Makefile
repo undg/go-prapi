@@ -20,6 +20,22 @@ confirm:
 no-dirty:
 	git diff --exit-code
 
+# generate_pactl_type: Generate Go struct from pactl JSON output
+# $(1): pactl command (e.g., "list sinks", "list sources")
+# $(2): type name (e.g., "sink", "source")
+#
+# Usage: $(call generate_pactl_type,<pactl_command>,<type_name>)
+define generate_pactl_type
+	# Run pactl, extract first item, generate Go struct
+	pactl --format=json $(1) | jq '.[0]' | gojsonstruct \
+		--package-name=pactl \
+		--typename=Pactl$(shell echo '$(2)' | sed 's/./\U&/')JSON \
+		--file-header="//lint:file-ignore ST1003 Ignore underscore naming in generated code" \
+		--int-type=float64 \
+		--o pactl/generated/$(2)-type.go
+	@echo "Manual adjustment needed in pactl/generated/$(2)-type.go for accurate types"
+endef
+
 # ==================================================================================== #
 # QUALITY CONTROL
 # ==================================================================================== #
@@ -35,12 +51,11 @@ tidy/ci: tidy no-dirty
 
 ## audit: run quality control checks
 .PHONY: audit/ci
-audit:
+audit/ci:
 	go mod verify
 	go vet ./...
 	go run honnef.co/go/tools/cmd/staticcheck@latest -checks=all,-ST1000,-U1000 ./...
 	go run golang.org/x/vuln/cmd/govulncheck@latest ./...
-	# go test -race -buildvcs -vet=off ./...
 
 .PHONY: audit
 audit/full: tidy audit/ci test
@@ -89,6 +104,20 @@ run/watch:
 # ==================================================================================== #
 # OPERATIONS
 # ==================================================================================== #
+
+.PHONY: sink-type
+sink-type:
+	go install github.com/twpayne/go-jsonstruct/v3/cmd/gojsonstruct@latest
+	$(call generate_pactl_type,list sinks,sink)
+
+.PHONY source-type:
+source-type:
+	go install github.com/twpayne/go-jsonstruct/v3/cmd/gojsonstruct@latest
+	$(call generate_pactl_type,list sources,source)
+
+## typesgen: generate structs from json output
+.PHONY: typesgen
+typesgen: sink-type source-type tidy
 
 ## push: push changes to the remote Git repository
 .PHONY: push
