@@ -1,21 +1,42 @@
 package pactl
 
 import (
+	"os/exec"
 	"regexp"
 	"testing"
+	"time"
 )
+
+func playsilence() *exec.Cmd {
+    cmd := exec.Command("paplay", "--raw", "--channels=2", "--format=s16le", "--rate=44100", "/dev/zero")
+    err := cmd.Start()
+    if err != nil {
+        panic(err)
+    }
+    time.Sleep(time.Second / 100) // Give time to appear in pactl
+    return cmd
+}
+
 func TestGetStatus(t *testing.T) {
-	t.Run("Volume", func(t *testing.T) {
+	t.Run("Outputs", func(t *testing.T) {
 		status, _ := GetStatus()
 		if status.Outputs == nil {
 			t.Errorf("Missing Outputs in Status struct")
 		}
 	})
+	t.Run("Apps", func(t *testing.T) {
+    cmd := playsilence()
+    defer cmd.Process.Kill()
+		status, _ := GetStatus()
+		if status.Apps == nil {
+			t.Errorf("Missing Apps in Status struct")
+		}
+	})
 }
 
-func TestGetSinks(t *testing.T) {
+func TestGetOutputs(t *testing.T) {
 	t.Run("Volume", func(t *testing.T) {
-		sink, _ := GetSinks()
+		sink, _ := GetOutputs()
 		if sink[0].Volume < 0 {
 			t.Errorf("Expected volume more than 0, but got %d", sink[0].Volume)
 		}
@@ -35,7 +56,7 @@ func TestGetSinks(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.Name, func(t *testing.T) {
-			sink, _ := GetSinks()
+			sink, _ := GetOutputs()
 			if got := re.MatchString(tt.Input); got != tt.Want {
 				t.Errorf("Expected name should starts with pattern, but got [%s]", sink[0].Name)
 			}

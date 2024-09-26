@@ -110,6 +110,12 @@ sink-type:
 	go install github.com/twpayne/go-jsonstruct/v3/cmd/gojsonstruct@latest
 	$(call generate_pactl_type,list sinks,sink)
 
+sink-item-type:
+	go install github.com/twpayne/go-jsonstruct/v3/cmd/gojsonstruct@latest
+	# ffplay -nodisp -autoexit -f lavfi -i "anullsrc=r=44100:cl=stereo" -loglevel quiet &
+	$(call generate_pactl_type,list sink-inputs,apps)
+	# killall ffplay
+
 .PHONY source-type:
 source-type:
 	go install github.com/twpayne/go-jsonstruct/v3/cmd/gojsonstruct@latest
