@@ -8,6 +8,7 @@ type Action string
 
 const (
 	// Message Actions
+	ActionGetStatus   Action = "GetStatus"
 	ActionGetSinks   Action = "GetSinks"
 	ActionGetCards   Action = "GetCards"
 	ActionGetOutputs Action = "GetOutputs"
@@ -24,6 +25,7 @@ const (
 )
 
 var availableCommands = []Action{
+	ActionGetStatus,
 	ActionGetSinks,
 	ActionGetCards,
 	ActionGetOutputs,

@@ -72,8 +72,11 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		}
 
 		switch msg.Action {
-		case ActionGetSinks:
+		case ActionGetStatus:
 			status, _ := pactl.GetStatus()
+			res.Payload = status
+		case ActionGetSinks:
+			status, _ := pactl.GetOutputs()
 			res.Payload = status
 		case ActionSetSink:
 			if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
@@ -92,7 +95,6 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			handleGetMute(&res)
 		case ActionGetCards:
 			handleGetCards(&res)
-		case ActionGetOutputs:
 			handleGetOutputs(&res)
 		case ActionGetSchema:
 			handleGetSchema(&res)
