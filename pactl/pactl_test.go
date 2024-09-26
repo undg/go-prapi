@@ -8,13 +8,13 @@ import (
 )
 
 func playsilence() *exec.Cmd {
-    cmd := exec.Command("paplay", "--raw", "--channels=2", "--format=s16le", "--rate=44100", "/dev/zero")
-    err := cmd.Start()
-    if err != nil {
-        panic(err)
-    }
-    time.Sleep(time.Second / 100) // Give time to appear in pactl
-    return cmd
+	cmd := exec.Command("paplay", "--raw", "--channels=2", "--format=s16le", "--rate=44100", "/dev/zero")
+	err := cmd.Start()
+	if err != nil {
+		panic(err)
+	}
+	time.Sleep(time.Second / 100) // Give time to appear in pactl
+	return cmd
 }
 
 func TestGetStatus(t *testing.T) {
@@ -25,8 +25,8 @@ func TestGetStatus(t *testing.T) {
 		}
 	})
 	t.Run("Apps", func(t *testing.T) {
-    cmd := playsilence()
-    defer cmd.Process.Kill()
+		cmd := playsilence()
+		defer cmd.Process.Kill()
 		status, _ := GetStatus()
 		if status.Apps == nil {
 			t.Errorf("Missing Apps in Status struct")

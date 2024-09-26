@@ -152,6 +152,6 @@ func GetStatus() (Status, error) {
 
 	return Status{
 		Outputs: outputs,
-		Apps: apps,
+		Apps:    apps,
 	}, nil
 }
