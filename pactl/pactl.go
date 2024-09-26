@@ -18,7 +18,7 @@ type Status = struct {
 }
 
 type Output struct {
-	Id     int    `json:"id" doc:"The id of the sink. Same  as name"`
+	ID     int    `json:"id" doc:"The id of the sink. Same  as name"`
 	Name   string `json:"name" doc:"The name of the sink. Same as id"`
 	Label  string `json:"label" doc:"Human-readable label for the sink"`
 	Volume int    `json:"volume" doc:"Current volume level of the sink"`
@@ -26,8 +26,8 @@ type Output struct {
 }
 
 type App struct {
-	Id       int    `json:"id" doc:"The id of the sink. Same  as name"`
-	OutputId int    `json:"outputId" doc:"Id of parrent device, same as output.id"`
+	ID       int    `json:"id" doc:"The id of the sink. Same  as name"`
+	OutputID int    `json:"outputId" doc:"Id of parrent device, same as output.id"`
 	Label    string `json:"label" doc:"Human-readable label for the sink"`
 	Volume   int    `json:"volume" doc:"Current volume level of the sink"`
 	Muted    bool   `json:"muted" doc:"Whether the sink is muted"`
@@ -55,7 +55,7 @@ func adaptOutputs(p gen.PactlSinkJSON) Output {
 	}
 
 	return Output{
-		Id:     int(p.Index),
+		ID:     int(p.Index),
 		Name:   p.Name,
 		Label:  p.Description,
 		Volume: (frontLeft + frontRight) / 2,
@@ -96,8 +96,8 @@ func adaptApps(p gen.PactlAppsJSON) App {
 	}
 
 	return App{
-		Id:       int(p.Index),
-		OutputId: int(p.Sink),
+		ID:       int(p.Index),
+		OutputID: int(p.Sink),
 		Label:    p.Properties.Application_Name,
 		Volume:   (frontLeft + frontRight) / 2,
 		Muted:    p.Mute,
