@@ -32,12 +32,13 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("New client connected. Total clients: %d", clientCount)
 
-	// Execute ActionGetSinks when a new client connects
-	sinks, _ := pactl.GetSinks()
+	// Execute ActionGetStatus when a new client connects
+	status, _ := pactl.GetStatus()
+
 	initialResponse := Response{
 		Action:  string(ActionGetSinks),
 		Status:  StatusSuccess,
-		Payload: sinks,
+		Payload: status,
 	}
 	if err := conn.WriteJSON(initialResponse); err != nil {
 		log.Printf("Error sending initial sinks data: %v", err)
@@ -71,16 +72,19 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		}
 
 		switch msg.Action {
+		case ActionGetStatus:
+			status, _ := pactl.GetStatus()
+			res.Payload = status
 		case ActionGetSinks:
-			sinks, _ := pactl.GetSinks()
-			res.Payload = sinks
+			status, _ := pactl.GetOutputs()
+			res.Payload = status
 		case ActionSetSink:
 			if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
 				name, _ := sinkInfo["name"].(string)
 				volume, _ := sinkInfo["volume"].(string)
 				pactl.SetSink(name, volume)
-				sinks, _ := pactl.GetSinks()
-				res.Payload = sinks
+				status, _ := pactl.GetStatus()
+				res.Payload = status
 			} else {
 				res.Error = "Invalid sink information format"
 				res.Status = StatusActionError
@@ -91,7 +95,6 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			handleGetMute(&res)
 		case ActionGetCards:
 			handleGetCards(&res)
-		case ActionGetOutputs:
 			handleGetOutputs(&res)
 		case ActionGetSchema:
 			handleGetSchema(&res)

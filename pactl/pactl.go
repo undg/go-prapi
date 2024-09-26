@@ -12,12 +12,25 @@ import (
 	gen "github.com/undg/go-prapi/pactl/generated"
 )
 
-type Sink struct {
-	ID     string `json:"id" doc:"The id of the sink. Same  as name"`
+type Status = struct {
+	Outputs []Output `json:"outputs" doc:"List of output devices"`
+	Apps    []App    `json:"apps" doc:"List of applications"`
+}
+
+type Output struct {
+	ID     int    `json:"id" doc:"The id of the sink. Same  as name"`
 	Name   string `json:"name" doc:"The name of the sink. Same as id"`
 	Label  string `json:"label" doc:"Human-readable label for the sink"`
 	Volume int    `json:"volume" doc:"Current volume level of the sink"`
 	Muted  bool   `json:"muted" doc:"Whether the sink is muted"`
+}
+
+type App struct {
+	ID       int    `json:"id" doc:"The id of the sink. Same  as name"`
+	OutputID int    `json:"outputId" doc:"Id of parrent device, same as output.id"`
+	Label    string `json:"label" doc:"Human-readable label for the sink"`
+	Volume   int    `json:"volume" doc:"Current volume level of the sink"`
+	Muted    bool   `json:"muted" doc:"Whether the sink is muted"`
 }
 
 func SetSink(sinkName string, volume string) {
@@ -28,48 +41,88 @@ func SetSink(sinkName string, volume string) {
 		log.Println("ERROR [SetSink]", err)
 		log.Printf("ERROR [SetSink] SINK_NAME: %s ; VOLUME: %s", sinkName, volumeInPercent)
 	}
-
 }
 
-func adaptSink(ps gen.PactlSinkJSON) Sink {
-	frontLeft, err := strconv.Atoi(strings.Trim(ps.Volume.FrontLeft.ValuePercent, "%"))
+func adaptOutputs(p gen.PactlSinkJSON) Output {
+	frontLeft, err := strconv.Atoi(strings.Trim(p.Volume.FrontLeft.ValuePercent, "%"))
 	if err != nil {
 		log.Println("ERROR adaptSink, parse front_left to int", err)
 	}
 
-	frontRight, err := strconv.Atoi(strings.Trim(ps.Volume.FrontLeft.ValuePercent, "%"))
+	frontRight, err := strconv.Atoi(strings.Trim(p.Volume.FrontLeft.ValuePercent, "%"))
 	if err != nil {
 		log.Println("ERROR adaptSink, parse front_right to int", err)
 	}
 
-	return Sink{
-		ID:     ps.Name,
-		Name:   ps.Name,
-		Label:  ps.Description,
+	return Output{
+		ID:     int(p.Index),
+		Name:   p.Name,
+		Label:  p.Description,
 		Volume: (frontLeft + frontRight) / 2,
-		Muted:  ps.Mute,
+		Muted:  p.Mute,
 	}
 }
 
-func GetSinks() ([]Sink, error) {
+func GetOutputs() ([]Output, error) {
 	cmd := exec.Command("pactl", "--format=json", "list", "sinks")
-	output, err := cmd.Output()
+	cmdOutput, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
 
 	var pactlSinks []gen.PactlSinkJSON
-	err = json.Unmarshal(output, &pactlSinks)
+	err = json.Unmarshal(cmdOutput, &pactlSinks)
 	if err != nil {
 		log.Println("ERROR Unmarshal pactlSinks in GetSinks.", err)
 	}
 
-	sinks := make([]Sink, len(pactlSinks))
+	sinks := make([]Output, len(pactlSinks))
 	for i, ps := range pactlSinks {
-		sinks[i] = adaptSink(ps)
+		sinks[i] = adaptOutputs(ps)
 	}
 
 	return sinks, nil
+}
+
+func adaptApps(p gen.PactlAppsJSON) App {
+	frontLeft, err := strconv.Atoi(strings.Trim(p.Volume.FrontLeft.ValuePercent, "%"))
+	if err != nil {
+		log.Println("ERROR adaptSink, parse front_left to int", err)
+	}
+
+	frontRight, err := strconv.Atoi(strings.Trim(p.Volume.FrontLeft.ValuePercent, "%"))
+	if err != nil {
+		log.Println("ERROR adaptSink, parse front_right to int", err)
+	}
+
+	return App{
+		ID:       int(p.Index),
+		OutputID: int(p.Sink),
+		Label:    p.Properties.Application_Name,
+		Volume:   (frontLeft + frontRight) / 2,
+		Muted:    p.Mute,
+	}
+}
+
+func GetApps() ([]App, error) {
+	cmd := exec.Command("pactl", "--format=json", "list", "sink-inputs")
+	cmdOutput, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	var pactlApps []gen.PactlAppsJSON
+	err = json.Unmarshal(cmdOutput, &pactlApps)
+	if err != nil {
+		log.Println("ERROR Unmarshal pactlApps in GetApps.", err)
+	}
+
+	apps := make([]App, len(pactlApps))
+	for i, ps := range pactlApps {
+		apps[i] = adaptApps(ps)
+	}
+
+	return apps, nil
 }
 
 func ListenForChanges(callback func()) {
@@ -84,4 +137,21 @@ func ListenForChanges(callback func()) {
 			callback()
 		}
 	}
+}
+
+func GetStatus() (Status, error) {
+	outputs, err := GetOutputs()
+	if err != nil {
+		log.Println("ERROR GetOutputs() in GetStatus", err)
+	}
+
+	apps, err := GetApps()
+	if err != nil {
+		log.Println("ERROR GetApps() in GetStatus()", err)
+	}
+
+	return Status{
+		Outputs: outputs,
+		Apps:    apps,
+	}, nil
 }
