@@ -72,7 +72,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		}
 
 		switch msg.Action {
-		case ActionGetStatus:
+		case ActionBroadcastStatus:
 			status, _ := pactl.GetStatus()
 			res.Payload = status
 		case ActionGetSinks:

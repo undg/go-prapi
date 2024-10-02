@@ -31,7 +31,7 @@ func broadcastUpdates() {
 
 		// Same Action and StatusSuccess if everyting is OK
 		res := Response{
-			Action: string(ActionGetSinks),
+			Action: string(ActionBroadcastStatus),
 			Status: StatusSuccess,
 		}
 
