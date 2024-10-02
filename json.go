@@ -8,7 +8,7 @@ type Action string
 
 const (
 	// Message Actions
-	ActionBroadcastStatus  Action = "BroadcastStatus"
+	ActionBroadcastStatus Action = "BroadcastStatus"
 
 	ActionGetSinks   Action = "GetSinks"
 	ActionGetCards   Action = "GetCards"
