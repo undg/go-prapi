@@ -72,12 +72,15 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		}
 
 		switch msg.Action {
+
 		case ActionBroadcastStatus:
 			status, _ := pactl.GetStatus()
 			res.Payload = status
+
 		case ActionGetSinks:
 			status, _ := pactl.GetOutputs()
 			res.Payload = status
+
 		case ActionSetSink:
 			if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
 				name, _ := sinkInfo["name"].(string)
@@ -89,6 +92,28 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 				res.Error = "Invalid sink information format"
 				res.Status = StatusActionError
 			}
+
+		case ActionSetMute:
+			if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
+				name, ok := sinkInfo["name"].(string)
+				if !ok {
+					log.Printf("Error in HandleWebSocket [ActionSetMute]: sinkInfo['name'].(string) not ok")
+				}
+				muted, ok := sinkInfo["muted"].(bool)
+				if !ok {
+					log.Printf("Error in HandleWebSocket [ActionSetMute]: sinkInfo['muted'].(bool) not ok")
+				}
+				pactl.SetSinkMuted(name, muted)
+				volStatus, err := pactl.GetStatus()
+				if err != nil {
+					log.Printf("Error in HandleWebSocket [ActionSetMute]: pactl.GetStatus(), err: %v", err)
+				}
+				res.Payload = volStatus
+			} else {
+				res.Error = "Invalid sink information format"
+				res.Status = StatusActionError
+			}
+
 		case ActionGetVolume:
 			handleGetVolume(&res)
 		case ActionGetMute:

@@ -19,7 +19,7 @@ const (
 
 	ActionSetSink    Action = "SetSink"
 	ActionSetVolume  Action = "SetVolume"
-	ActionSetMute    Action = "SetMute"
+	ActionSetMute    Action = "SetMuted"
 	ActionToggleMute Action = "ToggleMute"
 
 	ActionImAlive Action = "ImAlive"
