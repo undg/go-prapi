@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+
+	"github.com/undg/go-prapi/pactl"
 )
 
 func handleServerLog(msg *Message, res *Response) {
@@ -22,6 +24,72 @@ func handleServerLog(msg *Message, res *Response) {
 		log.Printf("ERROR serverLog res.MarshalJson %s", err)
 	}
 	fmt.Printf("LOG response: %s", string(resBytes))
+}
+
+func handleSetMuted(msg Message, res Response) {
+	if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		name, ok := sinkInfo["name"].(string)
+		if !ok {
+			log.Printf("Error in [handleSetMuted]: sinkInfo['name'].(string) not ok")
+		}
+		muted, ok := sinkInfo["muted"].(bool)
+		if !ok {
+			log.Printf("Error in [handleSetMuted]: sinkInfo['muted'].(bool) not ok")
+		}
+		pactl.SetSinkMuted(name, muted)
+		volStatus, err := pactl.GetStatus()
+		if err != nil {
+			log.Printf("Error in [handleSetMuted]: pactl.GetStatus(), err: %v", err)
+		}
+		res.Payload = volStatus
+	} else {
+		res.Error = "Invalid sink information format"
+		res.Status = StatusActionError
+	}
+}
+
+func handleSetMutedToggle(msg Message, res Response) {
+	if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		name, ok := sinkInfo["name"].(string)
+		if !ok {
+			log.Printf("Error in HandleWebSocket [ActionSetMute]: sinkInfo['name'].(string) not ok")
+		}
+		muted, ok := sinkInfo["muted"].(bool)
+		if !ok {
+			log.Printf("Error in HandleWebSocket [ActionSetMute]: sinkInfo['muted'].(bool) not ok")
+		}
+		pactl.SetSinkMuted(name, muted)
+		volStatus, err := pactl.GetStatus()
+		if err != nil {
+			log.Printf("Error in HandleWebSocket [ActionSetMute]: pactl.GetStatus(), err: %v", err)
+		}
+		res.Payload = volStatus
+	} else {
+		res.Error = "Invalid sink information format"
+		res.Status = StatusActionError
+	}
+}
+
+func handleSetSink(msg Message, res Response) {
+	if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		name, ok := sinkInfo["name"].(string)
+		if !ok {
+			log.Printf("Error in HandleWebSocket [ActionSetSink]: sinkInfo['name'].(string) not ok")
+		}
+		volume, ok := sinkInfo["volume"].(string)
+		if !ok {
+			log.Printf("Error in HandleWebSocket [ActionSetSink]: sinkInfo['volume'].(string) not ok")
+		}
+		pactl.SetSink(name, volume)
+		status, err := pactl.GetStatus()
+		if err != nil {
+			log.Printf("Error in HandleWebSocket [ActionSetSink]: pactl.GetStatus(), err: %v", err)
+		}
+		res.Payload = status
+	} else {
+		res.Error = "Invalid sink information format"
+		res.Status = StatusActionError
+	}
 }
 
 func handleSetVolume(res *Response, vol float64) {
