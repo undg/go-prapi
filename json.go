@@ -15,11 +15,11 @@ const (
 	ActionGetOutputs Action = "GetOutputs"
 	ActionGetVolume  Action = "GetVolume"
 	ActionGetSchema  Action = "GetSchema"
-	ActionGetMute    Action = "GetMute"
+	ActionGetMute    Action = "GetMuted"
 
 	ActionSetSink    Action = "SetSink"
 	ActionSetVolume  Action = "SetVolume"
-	ActionSetMute    Action = "SetMute"
+	ActionSetMute    Action = "SetMuted"
 	ActionToggleMute Action = "ToggleMute"
 
 	ActionImAlive Action = "ImAlive"

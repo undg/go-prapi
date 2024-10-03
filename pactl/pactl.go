@@ -43,6 +43,20 @@ func SetSink(sinkName string, volume string) {
 	}
 }
 
+func SetSinkMuted(sinkName string, muted bool) {
+	mutedCmd := "0"
+	if muted {
+		mutedCmd = "1"
+	}
+
+	cmd := exec.Command("pactl", "set-sink-mute", sinkName, mutedCmd)
+	_, err := cmd.Output()
+	if err != nil {
+		log.Println("ERROR [SetSinkMuted]", err)
+		log.Printf("ERROR [SetSinkMuted] SINK_NAME: %s ; muted: %s", sinkName, mutedCmd)
+	}
+}
+
 func adaptOutputs(p gen.PactlSinkJSON) Output {
 	frontLeft, err := strconv.Atoi(strings.Trim(p.Volume.FrontLeft.ValuePercent, "%"))
 	if err != nil {
