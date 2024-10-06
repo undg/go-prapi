@@ -10,6 +10,9 @@ const (
 	// Message Actions
 	ActionBroadcastStatus Action = "BroadcastStatus"
 
+	// Build metadata
+	ActionGetBuildInfo Action = "GetBuildInfo"
+
 	ActionGetSinks   Action = "GetSinks"
 	ActionGetCards   Action = "GetCards"
 	ActionGetOutputs Action = "GetOutputs"
@@ -27,6 +30,9 @@ const (
 
 var availableCommands = []Action{
 	ActionBroadcastStatus,
+
+	ActionGetBuildInfo,
+
 	ActionGetSinks,
 	ActionGetCards,
 	ActionGetOutputs,

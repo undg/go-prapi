@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/websocket"
+	"github.com/undg/go-prapi/buildInfo"
 	"github.com/undg/go-prapi/pactl"
 )
 
@@ -80,6 +81,10 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		case ActionGetSinks:
 			status, _ := pactl.GetOutputs()
 			res.Payload = status
+
+		case ActionGetBuildInfo:
+			b := buildInfo.Get()
+			res.Payload = b
 
 		case ActionSetSink:
 			handleSetSink(msg, res)
