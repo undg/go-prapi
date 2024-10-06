@@ -1,4 +1,4 @@
-package buildInfo
+package buildinfo
 
 import (
 	"fmt"
