@@ -20,6 +20,7 @@ type BuildInfo struct {
 	Compiler   string `json:"compiler" doc:"The compiler used for building"`
 	Platform   string `json:"platform" doc:"The operating system and architecture"`
 }
+
 // Get returns the overall codebase version. It's for detecting
 // what code a binary was built from.
 func Get() *BuildInfo {
@@ -34,4 +35,3 @@ func Get() *BuildInfo {
 		Platform:   fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
 	}
 }
-

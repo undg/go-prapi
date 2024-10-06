@@ -169,8 +169,8 @@ func GetStatus() (Status, error) {
 	bi := buildInfo.Get()
 
 	return Status{
-		Outputs: outputs,
-		Apps:    apps,
+		Outputs:   outputs,
+		Apps:      apps,
 		BuildInfo: *bi,
 	}, nil
 }
