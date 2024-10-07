@@ -35,16 +35,23 @@ func startServer(mux *http.ServeMux) {
 }
 
 func main() {
-	b := buildinfo.Get()
-	fmt.Println("\t* GitVersion:\t", b.GitVersion)
-	fmt.Println("\t* GitCommit:\t", b.GitCommit)
-	fmt.Println("\t* BuildDate:\t", b.BuildDate)
-	fmt.Println("\t* Compiler:\t", b.Compiler)
-	fmt.Println("\t* Platform:\t", b.Platform)
-	fmt.Println("\t* GoVersion:\t", b.GoVersion)
-
 	ip := getLocalIP()
-	fmt.Println("Listening on ws://" + ip + PORT)
+	b := buildinfo.Get()
+
+	fmt.Print(`
+┌───────────────────────────────────────────────────┐
+│                     GO-PRAPI                      │
+├───────────────────────────────────────────────────┤
+  GitVersion: `, b.GitVersion, `
+  GitCommit:  `, b.GitCommit, `
+  BuildDate:  `, b.BuildDate, `
+  Compiler:   `, b.Compiler, `
+  Platform:   `, b.Platform, `
+  GoVersion:  `, b.GoVersion, `
+└───────────────────────────────────────────────────┘
+`)
+
+	fmt.Println("\n🔥 Igniting server on ws://" + ip + PORT + "\n")
 
 	mux := http.NewServeMux()
 
