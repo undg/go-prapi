@@ -9,12 +9,14 @@ import (
 	"strings"
 
 	"github.com/goccy/go-json"
+	"github.com/undg/go-prapi/buildinfo"
 	gen "github.com/undg/go-prapi/pactl/generated"
 )
 
 type Status = struct {
-	Outputs []Output `json:"outputs" doc:"List of output devices"`
-	Apps    []App    `json:"apps" doc:"List of applications"`
+	Outputs   []Output            `json:"outputs" doc:"List of output devices"`
+	Apps      []App               `json:"apps" doc:"List of applications"`
+	BuildInfo buildinfo.BuildInfo `json:"buildInfo" doc:"Build information"`
 }
 
 type Output struct {
@@ -164,8 +166,11 @@ func GetStatus() (Status, error) {
 		log.Println("ERROR GetApps() in GetStatus()", err)
 	}
 
+	bi := buildinfo.Get()
+
 	return Status{
-		Outputs: outputs,
-		Apps:    apps,
+		Outputs:   outputs,
+		Apps:      apps,
+		BuildInfo: *bi,
 	}, nil
 }

@@ -7,7 +7,10 @@ import (
 	"sync"
 
 	"github.com/gorilla/websocket"
+	"github.com/undg/go-prapi/buildinfo"
 )
+
+// @TODO (undg) 2024-10-06: different port for dev and production
 
 const PORT = ":8448"
 const DEBUG = false
@@ -32,9 +35,17 @@ func startServer(mux *http.ServeMux) {
 }
 
 func main() {
-	ip := getLocalIP()
+	b := buildinfo.Get()
+	fmt.Println("\t* GitVersion:\t", b.GitVersion)
+	fmt.Println("\t* GitCommit:\t", b.GitCommit)
+	fmt.Println("\t* BuildDate:\t", b.BuildDate)
+	fmt.Println("\t* Compiler:\t", b.Compiler)
+	fmt.Println("\t* Platform:\t", b.Platform)
+	fmt.Println("\t* GoVersion:\t", b.GoVersion)
 
+	ip := getLocalIP()
 	fmt.Println("Listening on ws://" + ip + PORT)
+
 	mux := http.NewServeMux()
 
 	startServer(mux)
