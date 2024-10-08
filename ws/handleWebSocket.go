@@ -19,7 +19,6 @@ var Upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-
 var clients = make(map[*websocket.Conn]bool)
 var clientsMutex = &sync.Mutex{}
 

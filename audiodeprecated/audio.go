@@ -26,7 +26,6 @@ type OutputsInfo struct {
 	PortID      string
 }
 
-
 // ClientOpen don't forget to closeClient()
 func ClientOpen() pulseaudio.Client {
 	client, err := pulseaudio.NewClient()

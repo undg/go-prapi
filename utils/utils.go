@@ -10,7 +10,6 @@ import (
 const PORT = ":8448"
 const DEBUG = false
 
-
 func ActionsToStrings(actions []json.Action) []string {
 	strs := make([]string, len(actions))
 	for i, action := range actions {
