@@ -4,27 +4,22 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"sync"
 
-	"github.com/gorilla/websocket"
 	"github.com/undg/go-prapi/buildinfo"
+	"github.com/undg/go-prapi/json"
+	"github.com/undg/go-prapi/utils"
+	"github.com/undg/go-prapi/ws"
 )
 
 // @TODO (undg) 2024-10-06: different port for dev and production
-
-const PORT = ":8448"
-const DEBUG = false
-
-var clients = make(map[*websocket.Conn]bool)
-var clientsMutex = &sync.Mutex{}
 
 func startServer(mux *http.ServeMux) {
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/api":
-			RenderSchemaJSON(w, r)
+			json.RenderSchemaJSON(w, r)
 		case "/api/v1/ws":
-			HandleWebSocket(w, r)
+			ws.HandleWebSocket(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -35,7 +30,7 @@ func startServer(mux *http.ServeMux) {
 }
 
 func main() {
-	ip := getLocalIP()
+	ip := utils.GetLocalIP()
 	b := buildinfo.Get()
 
 	fmt.Print(`
@@ -51,15 +46,15 @@ func main() {
 └───────────────────────────────────────────────────┘
 `)
 
-	fmt.Println("\n🔥 Igniting server on ws://" + ip + PORT + "\n")
+	fmt.Println("\n🔥 Igniting server on ws://" + ip + utils.PORT + "\n")
 
 	mux := http.NewServeMux()
 
 	startServer(mux)
 
-	go broadcastUpdates()
+	go ws.BroadcastUpdates()
 
-	err := http.ListenAndServe(PORT, mux)
+	err := http.ListenAndServe(utils.PORT, mux)
 	if err != nil {
 		log.Fatal("ERROR ", err)
 	}
