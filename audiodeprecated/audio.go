@@ -27,7 +27,7 @@ type OutputsInfo struct {
 }
 
 
-// don't forget to closeClient()
+// ClientOpen don't forget to closeClient()
 func ClientOpen() pulseaudio.Client {
 	client, err := pulseaudio.NewClient()
 	if err != nil {
