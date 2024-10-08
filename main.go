@@ -30,7 +30,7 @@ func startServer(mux *http.ServeMux) {
 		}
 	})
 
-	fs := http.FileServer(http.Dir("./frontend"))
+	fs := http.FileServer(http.Dir("/tmp/bin/pr-web/dist"))
 	mux.Handle("/", fs)
 }
 

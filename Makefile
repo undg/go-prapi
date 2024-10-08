@@ -90,15 +90,34 @@ test/cover:
 	go test -v -race -buildvcs -coverprofile=/tmp/coverage.out ./...
 	go tool cover -html=/tmp/coverage.out
 
+## build: get latest frontend from github and build in /tmp/bin/pr-web/dist
+.PHONY: build/fe
+build/fe:
+	rm -rf /tmp/bin/pr-web
+	git clone "https://github.com/undg/pr-web" /tmp/bin/pr-web
+	cd /tmp/bin/pr-web && \
+	pnpm install && \
+	pnpm build
+
 ## build: build the application
 .PHONY: build
-build:
+build: 
 	# Include additional build steps, like TypeScript, SCSS or Tailwind compilation here...
 	go build -ldflags=${LDFLAGS} -o=/tmp/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
 
-## run: run the  application
+## build: build the application together with frontend
+.PHONY: build/full
+build/full: build/fe
+	build
+
+## run: build and run the application
 .PHONY: run
 run: build
+	/tmp/bin/${BINARY_NAME}
+
+## run: build/full and run the application
+.PHONY: run/full
+run/full: build/full
 	/tmp/bin/${BINARY_NAME}
 
 ## run/watch: run the application with reloading on file changes
