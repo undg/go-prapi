@@ -4,7 +4,6 @@ import (
 	j "encoding/json"
 	"fmt"
 	"log"
-	"strconv"
 
 	"github.com/undg/go-prapi/audiodeprecated"
 	"github.com/undg/go-prapi/json"
@@ -12,155 +11,186 @@ import (
 	"github.com/undg/go-prapi/utils"
 )
 
-func handleServerLog(msg *json.Message, res *json.Response) {
-	log.Println("")
-	if msg != nil {
-		msgBytes, err := j.MarshalIndent(msg, "", "	")
-		if err != nil {
-			log.Printf("ERROR serverLog j.MarshalIndent %s", err)
-		}
-		log.Printf("Client message: %s", string(msgBytes))
-	}
+func handleSetSinkVolume(msg *json.Message, res *json.Response) {
+	errPrefix := "ERROR [handleSetSinkVolume()]"
 
-	resBytes, err := res.MarshalJSON()
-	if err != nil {
-		log.Printf("ERROR serverLog res.MarshalJson %s", err)
-	}
-	fmt.Printf("LOG response: %s", string(resBytes))
-}
-
-func handleSetMuted(msg json.Message, res json.Response) {
 	if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
 		name, ok := sinkInfo["name"].(string)
 		if !ok {
-			log.Printf("Error in [handleSetMuted]: sinkInfo['name'].(string) not ok")
+			log.Printf("%s sinkInfo['name'].(string) NOT OK\n", errPrefix)
 		}
-		muted, ok := sinkInfo["muted"].(bool)
-		if !ok {
-			log.Printf("Error in [handleSetMuted]: sinkInfo['muted'].(bool) not ok")
-		}
-		pactl.SetSinkMuted(name, muted)
-		volStatus, err := pactl.GetStatus()
-		if err != nil {
-			log.Printf("Error in [handleSetMuted]: pactl.GetStatus(), err: %v", err)
-		}
-		res.Payload = volStatus
-	} else {
-		res.Error = "Invalid sink information format"
-		res.Status = json.StatusActionError
-	}
-}
 
-func handleSetMutedToggle(msg json.Message, res json.Response) {
-	if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
-		name, ok := sinkInfo["name"].(string)
-		if !ok {
-			log.Printf("Error in HandleWebSocket [ActionSetMute]: sinkInfo['name'].(string) not ok")
-		}
-		muted, ok := sinkInfo["muted"].(bool)
-		if !ok {
-			log.Printf("Error in HandleWebSocket [ActionSetMute]: sinkInfo['muted'].(bool) not ok")
-		}
-		pactl.SetSinkMuted(name, muted)
-		volStatus, err := pactl.GetStatus()
-		if err != nil {
-			log.Printf("Error in HandleWebSocket [ActionSetMute]: pactl.GetStatus(), err: %v", err)
-		}
-		res.Payload = volStatus
-	} else {
-		res.Error = "Invalid sink information format"
-		res.Status = json.StatusActionError
-	}
-}
-
-func handleSetSink(msg json.Message, res json.Response) {
-	if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
-		name, ok := sinkInfo["name"].(string)
-		if !ok {
-			log.Printf("Error in HandleWebSocket [ActionSetSink]: sinkInfo['name'].(string) not ok")
-		}
 		volume, ok := sinkInfo["volume"].(string)
 		if !ok {
-			log.Printf("Error in HandleWebSocket [ActionSetSink]: sinkInfo['volume'].(string) not ok")
+			log.Printf("%s sinkInfo['volume'].(string) NOT OK\n", errPrefix)
 		}
-		pactl.SetSink(name, volume)
-		status, err := pactl.GetStatus()
-		if err != nil {
-			log.Printf("Error in HandleWebSocket [ActionSetSink]: pactl.GetStatus(), err: %v", err)
-		}
-		res.Payload = status
+
+		pactl.SetSinkVolume(name, volume)
+
+		res.Payload = pactl.GetStatus()
 	} else {
 		res.Error = "Invalid sink information format"
 		res.Status = json.StatusActionError
 	}
 }
 
-func handleSetVolume(res *json.Response, vol float64) {
-	audioValue := audiodeprecated.SetVol(float32(vol))
-	res.Payload = audioValue.Volume
-	if utils.DEBUG {
-		log.Printf("handleSetVolume %s", res.Payload)
+func handleSetSinkMuted(msg *json.Message, res *json.Response) {
+	errPrefix := "ERROR [handleSetSinkMuted()]:"
+
+	if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		name, ok := sinkInfo["name"].(string)
+		if !ok {
+			log.Printf("%s sinkInfo['name'].(string) NOT OK\n", errPrefix)
+		}
+
+		muted, ok := sinkInfo["muted"].(string)
+		if !ok {
+			log.Printf("%s sinkInfo['muted'].(bool) NOT OK\n", errPrefix)
+		}
+
+		pactl.SetSinkMuted(name, muted)
+
+		res.Payload = pactl.GetStatus()
+
+	} else {
+		res.Error = "Invalid sink information format"
+		res.Status = json.StatusActionError
 	}
 }
 
-func handleGetVolume(res *json.Response) {
-	audio := audiodeprecated.GetVol()
-	res.Payload = strconv.FormatFloat(float64(audio.Volume), 'f', -1, 32)
-	if utils.DEBUG {
-		log.Printf("handleGetVolume %s", res.Payload)
+func handleSetSinkInputVolume(msg *json.Message, res *json.Response) {
+	errPrefix := "ERROR [handleSetSinkInputVolume()]:"
+
+	if sinkInputInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		id, ok := sinkInputInfo["id"].(float64)
+		if !ok {
+			log.Printf("%s sinkInfo['id'].(float64) NOT OK\n", errPrefix)
+		}
+
+		volume, ok := sinkInputInfo["volume"].(string)
+		if !ok {
+			log.Printf("%s sinkInfo['volume'].(string) NOT OK\n", errPrefix)
+		}
+
+		pactl.SetSinkInputVolume(fmt.Sprintf("%.0f", id), volume)
+
+		res.Payload = pactl.GetStatus()
+	} else {
+		res.Error = "Invalid sink information format"
+		res.Status = json.StatusActionError
 	}
 }
 
-func handleGetMute(res *json.Response) {
-	audio := audiodeprecated.GetVol()
-	res.Payload = strconv.FormatBool(audio.Mute)
-	if utils.DEBUG {
-		log.Printf("handleGetMute %s", res.Payload)
+func handleSetSinkInputMuted(msg *json.Message, res *json.Response) {
+	errPrefix := "ERROR [handleSetSinkInputMuted()]:"
+
+	if sinkInputInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		name, ok := sinkInputInfo["id"].(string)
+		if !ok {
+			log.Printf("%s sinkInfo['id'].(string) NOT OK\n", errPrefix)
+		}
+
+		muted, ok := sinkInputInfo["muted"].(string)
+		if !ok {
+			log.Printf("%s sinkInfo['muted'].(bool) NOT OK\n", errPrefix)
+		}
+
+		pactl.SetSinkMuted(name, muted)
+
+		res.Payload = pactl.GetStatus()
+	} else {
+		res.Error = "Invalid sink information format"
+		res.Status = json.StatusActionError
 	}
 }
 
 func handleGetCards(res *json.Response) {
+	errPrefix := "ERROR [handleGetCards()]"
+	debugPrefix := "DEBUG [handleGetCards()]"
+
 	cards, err := audiodeprecated.GetCards()
 	if err != nil {
-		log.Printf("ERROR readerJson GetCards %s", err)
+		log.Printf("%s audiodeprecated.GetCards(): %s\n", errPrefix, err)
 		res.Error = "ERROR can't get cards information from the system"
 		res.Status = json.StatusError
 	}
+
 	b, err := j.Marshal(cards)
 	if err != nil {
-		log.Printf("ERROR readerJson j.Marshal %s", err)
+		log.Printf("%s j.Marshal(cards): %s\n", errPrefix, err)
 		res.Error = "ERROR can't pull cards information"
 		res.Status = json.StatusError
 	}
+
 	res.Payload = string(b)
 	if utils.DEBUG {
-		log.Printf("handleGetCards %s", res.Payload)
+		log.Printf("%s handleGetCards(res).Action: %s\n", debugPrefix, res.Action)
+		log.Printf("%s handleGetCards(res).Payload: %s\n", debugPrefix, res.Payload)
 	}
 }
 
 func handleGetOutputs(res *json.Response) {
+	errPrefix := "ERROR [handleGetOutputs()]"
+	debugPrefix := "DEBUG [handleGetOutputs()]"
+
 	outputs, err := audiodeprecated.GetOutputs()
 	if err != nil {
-		log.Printf("ERROR readerJson getOutputs %s", err)
+		log.Printf("%s audiodeprecated.GetOutputs(): %s\n", errPrefix, err)
+
 		res.Error = "ERROR can't get outputs information from the system"
 		res.Status = json.StatusError
 	}
+
 	b, err := j.Marshal(outputs)
 	if err != nil {
-		log.Printf("ERROR readerJson j.Marshal %s", err)
+		log.Printf("%s j.Marshal(): %s\n", errPrefix, err)
+
 		res.Error = "ERROR can't pull outputs information"
 		res.Status = json.StatusError
 	}
+
 	res.Payload = string(b)
+
 	if utils.DEBUG {
-		log.Printf("handleGetOutputs %s", res.Payload)
+		log.Printf("%s res.Payload: %s\n", debugPrefix, res.Payload)
 	}
 }
 
 func handleGetSchema(res *json.Response) {
+	debugPrefix := "DEBUG [handleGetSchema()]"
 	schema := json.GetSchemaJSON()
+
 	res.Payload = schema
 	if utils.DEBUG {
-		log.Printf("handleGetSchema %s", res.Payload)
+		log.Printf("%s res.Action: %s\n", debugPrefix, res.Action)
+		log.Printf("%s res.Payload: %s\n", debugPrefix, res.Payload)
 	}
+}
+
+func handleServerLog(msg *json.Message, res *json.Response) {
+	errPrefix := "ERROR [handleServerLog()]"
+
+	fmt.Printf("\n")
+	log.Printf("\n-->\n")
+
+	if msg != nil {
+		msgBytes, err := j.MarshalIndent(msg, "", "	")
+		if err != nil {
+			fmt.Printf("%s j.MarshalIndent(): %s\n", errPrefix, err)
+		}
+		fmt.Printf("CLIENT message: %s\n", string(msgBytes))
+	}
+
+	if utils.DEBUG {
+		resBytes, err := j.MarshalIndent(res, "", "	")
+		if err != nil {
+			fmt.Printf("%s serverLog res.MarshalJson %s\n", errPrefix, err)
+		}
+
+		fmt.Printf("SERVER res: %s\n", string(resBytes))
+	} else {
+		fmt.Printf("SERVER res.status: %d\n", res.Status)
+	}
+
+	fmt.Printf(">--\n\n")
 }

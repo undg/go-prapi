@@ -7,45 +7,36 @@ import (
 type Action string
 
 const (
-	// Message Actions
-	ActionBroadcastStatus Action = "BroadcastStatus"
+	// Get composed informations about all sinks, sources, inputs and build
+	ActionGetStatus Action = "GetStatus"
 
-	// Build metadata
+	// Metadata about build
 	ActionGetBuildInfo Action = "GetBuildInfo"
+
+	ActionSetSinkVolume Action = "SetSinkVolume"
+	ActionSetSinkMuted  Action = "SetSinkMuted"
+
+	ActionSetSinkInputVolume Action = "SetSinkInputVolume"
+	ActionSetSinkInputMuted  Action = "SetSinkInputMuted"
 
 	ActionGetSinks   Action = "GetSinks"
 	ActionGetCards   Action = "GetCards"
 	ActionGetOutputs Action = "GetOutputs"
-	ActionGetVolume  Action = "GetVolume"
 	ActionGetSchema  Action = "GetSchema"
-	ActionGetMute    Action = "GetMuted"
-
-	ActionSetSink    Action = "SetSink"
-	ActionSetVolume  Action = "SetVolume"
-	ActionSetMute    Action = "SetMuted"
-	ActionToggleMute Action = "ToggleMute"
-
-	ActionImAlive Action = "ImAlive"
 )
 
 var AvailableCommands = []Action{
-	ActionBroadcastStatus,
-
+	ActionGetStatus,
 	ActionGetBuildInfo,
+	ActionSetSinkVolume,
+	ActionSetSinkMuted,
+	ActionSetSinkInputVolume,
+	ActionSetSinkInputMuted,
 
 	ActionGetSinks,
 	ActionGetCards,
 	ActionGetOutputs,
-	ActionGetVolume,
 	ActionGetSchema,
-	ActionGetMute,
-
-	ActionSetSink,
-	ActionSetVolume,
-	ActionSetMute,
-	ActionToggleMute,
-
-	ActionImAlive,
 }
 
 // Message is an request from the client
