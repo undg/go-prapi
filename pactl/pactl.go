@@ -35,27 +35,42 @@ type App struct {
 	Muted    bool   `json:"muted" doc:"Whether the sink is muted"`
 }
 
-func SetSink(sinkName string, volume string) {
+func SetSinkVolume(sinkName string, volume string) {
 	volumeInPercent := fmt.Sprint(volume) + "%"
 	cmd := exec.Command("pactl", "set-sink-volume", sinkName, volumeInPercent)
 	_, err := cmd.Output()
 	if err != nil {
 		log.Println("ERROR [SetSink]", err)
-		log.Printf("ERROR [SetSink] SINK_NAME: %s ; VOLUME: %s", sinkName, volumeInPercent)
+		log.Printf("ERROR [SetSink] SINK_NAME: %s ; VOLUME: %s\n", sinkName, volumeInPercent)
 	}
 }
 
-func SetSinkMuted(sinkName string, muted bool) {
-	mutedCmd := "0"
-	if muted {
-		mutedCmd = "1"
-	}
+func SetSinkMuted(sinkName string, mutedCmd string) {
 
 	cmd := exec.Command("pactl", "set-sink-mute", sinkName, mutedCmd)
 	_, err := cmd.Output()
 	if err != nil {
 		log.Println("ERROR [SetSinkMuted]", err)
-		log.Printf("ERROR [SetSinkMuted] SINK_NAME: %s ; muted: %s", sinkName, mutedCmd)
+		log.Printf("ERROR [SetSinkMuted] SINK_NAME: %s ; muted: %s\n", sinkName, mutedCmd)
+	}
+}
+
+func SetSinkInputVolume(sinkInputId string, volume string) {
+	volumeInPercent := fmt.Sprint(volume) + "%"
+	cmd := exec.Command("pactl", "set-sink-input-volume", sinkInputId, volumeInPercent)
+	_, err := cmd.Output()
+	if err != nil {
+		log.Println("ERROR [SetSinkInput]", err)
+		log.Printf("ERROR [SetSinkInput] SINK_INPUT_ID: %s ; VOLUME: %s\n", sinkInputId, volumeInPercent)
+	}
+}
+
+func SetSinkInputMuted(sinkInputId string, mutedCmd string) {
+	cmd := exec.Command("pactl", "set-sink-mute", sinkInputId, mutedCmd)
+	_, err := cmd.Output()
+	if err != nil {
+		log.Println("ERROR [SetSinkMuted]", err)
+		log.Printf("ERROR [SetSinkMuted] SINK_INPUT_ID: %s ; muted: %s\n", sinkInputId, mutedCmd)
 	}
 }
 

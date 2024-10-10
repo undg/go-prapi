@@ -33,7 +33,7 @@ func BroadcastUpdates() {
 
 		// Same Action and StatusSuccess if everyting is OK
 		res := json.Response{
-			Action: string(json.ActionBroadcastStatus),
+			Action: string(json.ActionGetStatus),
 			Status: json.StatusSuccess,
 		}
 
@@ -56,7 +56,7 @@ func BroadcastUpdates() {
 			conn.SetWriteDeadline(time.Now().Add(writeWait))
 			err := conn.WriteJSON(res)
 			if err != nil {
-				log.Printf("Error broadcast VOLUME update to client: %v", err)
+				log.Printf("Error broadcast VOLUME update to client: %v\n", err)
 				conn.Close()
 				delete(clients, conn)
 			} else {
@@ -65,6 +65,6 @@ func BroadcastUpdates() {
 		}
 		clientsMutex.Unlock()
 
-		log.Printf("Volume broadcast sent to %d/%d clients. Value: %v", updatedClients, clientsCount, res.Payload)
+		log.Printf("Volume broadcast sent to %d/%d clients. Value: %v\n", updatedClients, clientsCount, res.Payload)
 	}
 }
