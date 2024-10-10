@@ -58,26 +58,26 @@ func SetSinkMuted(sinkName string, mutedCmd string) {
 	}
 }
 
-func SetSinkInputVolume(sinkInputId string, volume string) {
+func SetSinkInputVolume(sinkInputID string, volume string) {
 	errPrefix := "ERROR [SetSinkInputVolume()]"
 	volumeInPercent := volume + "%"
 
-	cmd := exec.Command("pactl", "set-sink-input-volume", sinkInputId, volumeInPercent)
+	cmd := exec.Command("pactl", "set-sink-input-volume", sinkInputID, volumeInPercent)
 	_, err := cmd.Output()
 	if err != nil {
 		log.Printf("%s pactl set-sink-input-volume: %s\n", errPrefix, err)
-		log.Printf("%s pactl set-sink-input-volume: {SINK_INPUT_ID: %s ; VOLUME: %s}\n", errPrefix, sinkInputId, volumeInPercent)
+		log.Printf("%s pactl set-sink-input-volume: {SINK_INPUT_ID: %s ; VOLUME: %s}\n", errPrefix, sinkInputID, volumeInPercent)
 	}
 }
 
-func SetSinkInputMuted(sinkInputId string, mutedCmd string) {
+func SetSinkInputMuted(sinkInputID string, mutedCmd string) {
 	errPrefix := "ERROR [SetSinkInputMuted()]"
 
-	cmd := exec.Command("pactl", "set-sink-mute", sinkInputId, mutedCmd)
+	cmd := exec.Command("pactl", "set-sink-mute", sinkInputID, mutedCmd)
 	_, err := cmd.Output()
 	if err != nil {
 		log.Printf("%s pactl set-sink-mute: %s\n", errPrefix, err)
-		log.Printf("%s pactl set-sink-mute: {SINK_INPUT_ID: %s ; MUTED: %s}\n", errPrefix, sinkInputId, mutedCmd)
+		log.Printf("%s pactl set-sink-mute: {SINK_INPUT_ID: %s ; MUTED: %s}\n", errPrefix, sinkInputID, mutedCmd)
 	}
 }
 

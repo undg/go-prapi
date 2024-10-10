@@ -14,10 +14,10 @@ const (
 	ActionGetBuildInfo Action = "GetBuildInfo"
 
 	ActionSetSinkVolume Action = "SetSinkVolume"
-	ActionSetSinkMuted   Action = "SetSinkMuted"
+	ActionSetSinkMuted  Action = "SetSinkMuted"
 
 	ActionSetSinkInputVolume Action = "SetSinkInputVolume"
-	ActionSetSinkInputMuted   Action = "SetSinkInputMuted"
+	ActionSetSinkInputMuted  Action = "SetSinkInputMuted"
 
 	ActionGetSinks   Action = "GetSinks"
 	ActionGetCards   Action = "GetCards"
@@ -82,4 +82,3 @@ func (r Response) MarshalJSON() ([]byte, error) {
 
 	return json.Marshal(data)
 }
-
