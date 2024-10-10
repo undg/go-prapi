@@ -11,7 +11,7 @@ import (
 	"github.com/undg/go-prapi/utils"
 )
 
-func handleSetSinkVolume(msg json.Message, res json.Response) {
+func handleSetSinkVolume(msg *json.Message, res *json.Response) {
 	errPrefix := "ERROR [handleSetSinkVolume()]"
 
 	if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
@@ -27,19 +27,14 @@ func handleSetSinkVolume(msg json.Message, res json.Response) {
 
 		pactl.SetSinkVolume(name, volume)
 
-		status, err := pactl.GetStatus()
-		if err != nil {
-			log.Printf("%s pactl.GetStatus(), err: %s\n", errPrefix, err)
-		}
-
-		res.Payload = status
+		res.Payload = pactl.GetStatus()
 	} else {
 		res.Error = "Invalid sink information format"
 		res.Status = json.StatusActionError
 	}
 }
 
-func handleSetSinkMuted(msg json.Message, res json.Response) {
+func handleSetSinkMuted(msg *json.Message, res *json.Response) {
 	errPrefix := "ERROR [handleSetSinkMuted()]:"
 
 	if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
@@ -55,19 +50,15 @@ func handleSetSinkMuted(msg json.Message, res json.Response) {
 
 		pactl.SetSinkMuted(name, muted)
 
-		volStatus, err := pactl.GetStatus()
-		if err != nil {
-			log.Printf("%s pactl.GetStatus(), err: %s\n", errPrefix, err)
-		}
+		res.Payload = pactl.GetStatus()
 
-		res.Payload = volStatus
 	} else {
 		res.Error = "Invalid sink information format"
 		res.Status = json.StatusActionError
 	}
 }
 
-func handleSetSinkInputVolume(msg json.Message, res json.Response) {
+func handleSetSinkInputVolume(msg *json.Message, res *json.Response) {
 	errPrefix := "ERROR [handleSetSinkInputVolume()]:"
 
 	if sinkInputInfo, ok := msg.Payload.(map[string]interface{}); ok {
@@ -83,19 +74,14 @@ func handleSetSinkInputVolume(msg json.Message, res json.Response) {
 
 		pactl.SetSinkInputVolume(fmt.Sprintf("%.0f", id), volume)
 
-		status, err := pactl.GetStatus()
-
-		if err != nil {
-			log.Printf("%s pactl.GetStatus(), err: %s\n", errPrefix, err)
-		}
-		res.Payload = status
+		res.Payload = pactl.GetStatus()
 	} else {
 		res.Error = "Invalid sink information format"
 		res.Status = json.StatusActionError
 	}
 }
 
-func handleSetSinkInputMuted(msg json.Message, res json.Response) {
+func handleSetSinkInputMuted(msg *json.Message, res *json.Response) {
 	errPrefix := "ERROR [handleSetSinkInputMuted()]:"
 
 	if sinkInputInfo, ok := msg.Payload.(map[string]interface{}); ok {
@@ -111,12 +97,7 @@ func handleSetSinkInputMuted(msg json.Message, res json.Response) {
 
 		pactl.SetSinkMuted(name, muted)
 
-		volStatus, err := pactl.GetStatus()
-		if err != nil {
-			log.Printf("%s pactl.GetStatus(), err: %s\n", errPrefix, err)
-		}
-
-		res.Payload = volStatus
+		res.Payload = pactl.GetStatus()
 	} else {
 		res.Error = "Invalid sink information format"
 		res.Status = json.StatusActionError
@@ -171,7 +152,7 @@ func handleGetOutputs(res *json.Response) {
 	res.Payload = string(b)
 
 	if utils.DEBUG {
-		log.Printf("%s res.Payload: %s\n",debugPrefix, res.Payload)
+		log.Printf("%s res.Payload: %s\n", debugPrefix, res.Payload)
 	}
 }
 
@@ -181,30 +162,35 @@ func handleGetSchema(res *json.Response) {
 
 	res.Payload = schema
 	if utils.DEBUG {
-		log.Printf("%s res.Action: %s\n",debugPrefix, res.Action)
-		log.Printf("%s res.Payload: %s\n",debugPrefix, res.Payload)
+		log.Printf("%s res.Action: %s\n", debugPrefix, res.Action)
+		log.Printf("%s res.Payload: %s\n", debugPrefix, res.Payload)
 	}
 }
 
 func handleServerLog(msg *json.Message, res *json.Response) {
 	errPrefix := "ERROR [handleServerLog()]"
 
-	fmt.Printf("\n-->\n")
+	fmt.Printf("\n")
+	log.Printf("\n-->\n")
 
 	if msg != nil {
 		msgBytes, err := j.MarshalIndent(msg, "", "	")
 		if err != nil {
-			log.Printf("%s j.MarshalIndent(): %s\n", errPrefix, err)
+			fmt.Printf("%s j.MarshalIndent(): %s\n", errPrefix, err)
 		}
-		log.Printf("CLIENT message: %s\n", string(msgBytes))
+		fmt.Printf("CLIENT message: %s\n", string(msgBytes))
 	}
 
-	resBytes, err := j.MarshalIndent(res, "", "	")
-	if err != nil {
-		log.Printf("%s serverLog res.MarshalJson %s\n", errPrefix, err)
+	if utils.DEBUG {
+		resBytes, err := j.MarshalIndent(res, "", "	")
+		if err != nil {
+			fmt.Printf("%s serverLog res.MarshalJson %s\n", errPrefix, err)
+		}
+
+		fmt.Printf("SERVER res: %s\n", string(resBytes))
+	} else {
+		fmt.Printf("SERVER res.status: %d\n", res.Status)
 	}
 
-	log.Printf("SERVER response: %s\n", string(resBytes))
-
-	fmt.Printf(">--\n")
+	fmt.Printf(">--\n\n")
 }

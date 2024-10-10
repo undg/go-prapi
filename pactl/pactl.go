@@ -36,53 +36,62 @@ type App struct {
 }
 
 func SetSinkVolume(sinkName string, volume string) {
+	errPrefix := "ERROR [SetSinkVolume()]"
 	volumeInPercent := fmt.Sprint(volume) + "%"
+
 	cmd := exec.Command("pactl", "set-sink-volume", sinkName, volumeInPercent)
 	_, err := cmd.Output()
 	if err != nil {
-		log.Println("ERROR [SetSink]", err)
-		log.Printf("ERROR [SetSink] SINK_NAME: %s ; VOLUME: %s\n", sinkName, volumeInPercent)
+		log.Printf("%s pactl set-sink-volume: %s\n", errPrefix, err)
+		log.Printf("%s pactl set-sink-volume: {SINK_NAME: %s ; VOLUME: %s}\n", errPrefix, sinkName, volumeInPercent)
 	}
 }
 
 func SetSinkMuted(sinkName string, mutedCmd string) {
+	errPrefix := "ERROR [SetSinkMuted()]"
 
 	cmd := exec.Command("pactl", "set-sink-mute", sinkName, mutedCmd)
 	_, err := cmd.Output()
 	if err != nil {
-		log.Println("ERROR [SetSinkMuted]", err)
-		log.Printf("ERROR [SetSinkMuted] SINK_NAME: %s ; muted: %s\n", sinkName, mutedCmd)
+		log.Printf("%s pactl set-sink-mute: %s\n", errPrefix, err)
+		log.Printf("%s pactl set-sink-mute: {SINK_NAME: %s ; MUTED: %s}\n", errPrefix, sinkName, mutedCmd)
 	}
 }
 
 func SetSinkInputVolume(sinkInputId string, volume string) {
-	volumeInPercent := fmt.Sprint(volume) + "%"
+	errPrefix := "ERROR [SetSinkInputVolume()]"
+	volumeInPercent := volume + "%"
+
 	cmd := exec.Command("pactl", "set-sink-input-volume", sinkInputId, volumeInPercent)
 	_, err := cmd.Output()
 	if err != nil {
-		log.Println("ERROR [SetSinkInput]", err)
-		log.Printf("ERROR [SetSinkInput] SINK_INPUT_ID: %s ; VOLUME: %s\n", sinkInputId, volumeInPercent)
+		log.Printf("%s pactl set-sink-input-volume: %s\n", errPrefix, err)
+		log.Printf("%s pactl set-sink-input-volume: {SINK_INPUT_ID: %s ; VOLUME: %s}\n", errPrefix, sinkInputId, volumeInPercent)
 	}
 }
 
 func SetSinkInputMuted(sinkInputId string, mutedCmd string) {
+	errPrefix := "ERROR [SetSinkInputMuted()]"
+
 	cmd := exec.Command("pactl", "set-sink-mute", sinkInputId, mutedCmd)
 	_, err := cmd.Output()
 	if err != nil {
-		log.Println("ERROR [SetSinkMuted]", err)
-		log.Printf("ERROR [SetSinkMuted] SINK_INPUT_ID: %s ; muted: %s\n", sinkInputId, mutedCmd)
+		log.Printf("%s pactl set-sink-mute: %s\n", errPrefix, err)
+		log.Printf("%s pactl set-sink-mute: {SINK_INPUT_ID: %s ; MUTED: %s}\n", errPrefix, sinkInputId, mutedCmd)
 	}
 }
 
 func adaptOutputs(p gen.PactlSinkJSON) Output {
+	errPrefix := "ERROR [adaptOutputs()]"
+
 	frontLeft, err := strconv.Atoi(strings.Trim(p.Volume.FrontLeft.ValuePercent, "%"))
 	if err != nil {
-		log.Println("ERROR adaptSink, parse front_left to int", err)
+		log.Printf("%s parse FRONT_LEFT to int: %s\n", errPrefix, err)
 	}
 
 	frontRight, err := strconv.Atoi(strings.Trim(p.Volume.FrontLeft.ValuePercent, "%"))
 	if err != nil {
-		log.Println("ERROR adaptSink, parse front_right to int", err)
+		log.Printf("%s parse FRONT_RIGHT to int: %s\n", errPrefix, err)
 	}
 
 	return Output{
@@ -95,6 +104,8 @@ func adaptOutputs(p gen.PactlSinkJSON) Output {
 }
 
 func GetOutputs() ([]Output, error) {
+	errPrefix := "ERROR [GetOutputs()]"
+
 	cmd := exec.Command("pactl", "--format=json", "list", "sinks")
 	cmdOutput, err := cmd.Output()
 	if err != nil {
@@ -104,7 +115,7 @@ func GetOutputs() ([]Output, error) {
 	var pactlSinks []gen.PactlSinkJSON
 	err = json.Unmarshal(cmdOutput, &pactlSinks)
 	if err != nil {
-		log.Println("ERROR Unmarshal pactlSinks in GetSinks.", err)
+		log.Printf("%s json.Unmarshal: %s\n", errPrefix, err)
 	}
 
 	sinks := make([]Output, len(pactlSinks))
@@ -116,14 +127,16 @@ func GetOutputs() ([]Output, error) {
 }
 
 func adaptApps(p gen.PactlAppsJSON) App {
+	errPrefix := "ERROR [adaptApps()]"
+
 	frontLeft, err := strconv.Atoi(strings.Trim(p.Volume.FrontLeft.ValuePercent, "%"))
 	if err != nil {
-		log.Println("ERROR adaptSink, parse front_left to int", err)
+		log.Printf("%s parse FRONT_LEFT to INT: %s\n", errPrefix, err)
 	}
 
 	frontRight, err := strconv.Atoi(strings.Trim(p.Volume.FrontLeft.ValuePercent, "%"))
 	if err != nil {
-		log.Println("ERROR adaptSink, parse front_right to int", err)
+		log.Printf("%s parse FRONT_RIGHT to INT: %s\n", errPrefix, err)
 	}
 
 	return App{
@@ -135,17 +148,19 @@ func adaptApps(p gen.PactlAppsJSON) App {
 	}
 }
 
-func GetApps() ([]App, error) {
+func GetApps() []App {
+	errPrefix := "ERROR [pactl.GetApps()]"
+
 	cmd := exec.Command("pactl", "--format=json", "list", "sink-inputs")
 	cmdOutput, err := cmd.Output()
 	if err != nil {
-		return nil, err
+		log.Printf("%s cmd.Output(): %s", errPrefix, err)
 	}
 
 	var pactlApps []gen.PactlAppsJSON
 	err = json.Unmarshal(cmdOutput, &pactlApps)
 	if err != nil {
-		log.Println("ERROR Unmarshal pactlApps in GetApps.", err)
+		log.Printf("%s json.Unmarshal(): %s", errPrefix, err)
 	}
 
 	apps := make([]App, len(pactlApps))
@@ -153,7 +168,7 @@ func GetApps() ([]App, error) {
 		apps[i] = adaptApps(ps)
 	}
 
-	return apps, nil
+	return apps
 }
 
 func ListenForChanges(callback func()) {
@@ -170,16 +185,15 @@ func ListenForChanges(callback func()) {
 	}
 }
 
-func GetStatus() (Status, error) {
+func GetStatus() Status {
+	errPrefix := "ERROR [GetStatus()]"
+
 	outputs, err := GetOutputs()
 	if err != nil {
-		log.Println("ERROR GetOutputs() in GetStatus", err)
+		log.Printf("%s GetOutputs(): %s", errPrefix, err)
 	}
 
-	apps, err := GetApps()
-	if err != nil {
-		log.Println("ERROR GetApps() in GetStatus()", err)
-	}
+	apps := GetApps()
 
 	bi := buildinfo.Get()
 
@@ -187,5 +201,5 @@ func GetStatus() (Status, error) {
 		Outputs:   outputs,
 		Apps:      apps,
 		BuildInfo: *bi,
-	}, nil
+	}
 }

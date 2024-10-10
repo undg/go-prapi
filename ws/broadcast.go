@@ -37,11 +37,7 @@ func BroadcastUpdates() {
 			Status: json.StatusSuccess,
 		}
 
-		status, err := pactl.GetStatus()
-		if err != nil {
-			log.Println("ERROR pactl.GetStatus() in broadcastUpdates()", err)
-		}
-		res.Payload = status
+		res.Payload = pactl.GetStatus()
 
 		equal := reflect.DeepEqual(res, prevRes)
 		if equal {

@@ -19,7 +19,7 @@ func playsilence() *exec.Cmd {
 
 func TestGetStatus(t *testing.T) {
 	t.Run("Outputs", func(t *testing.T) {
-		status, _ := GetStatus()
+		status := GetStatus()
 		if status.Outputs == nil {
 			t.Errorf("Missing Outputs in Status struct")
 		}
@@ -27,7 +27,7 @@ func TestGetStatus(t *testing.T) {
 	t.Run("Apps", func(t *testing.T) {
 		cmd := playsilence()
 		defer cmd.Process.Kill()
-		status, _ := GetStatus()
+		status := GetStatus()
 		if status.Apps == nil {
 			t.Errorf("Missing Apps in Status struct")
 		}

@@ -59,7 +59,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	log.Printf("New client connected. Total clients: %d\n", clientCount)
 
 	// Execute ActionGetStatus when a new client connects
-	status, _ := pactl.GetStatus()
+	status := pactl.GetStatus()
 
 	initialResponse := json.Response{
 		Action:  string(json.ActionGetStatus),
@@ -100,7 +100,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		switch msg.Action {
 
 		case json.ActionGetStatus:
-			status, _ := pactl.GetStatus()
+			status := pactl.GetStatus()
 			res.Payload = status
 
 		case json.ActionGetBuildInfo:
@@ -108,16 +108,16 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			res.Payload = b
 
 		case json.ActionSetSinkVolume:
-			handleSetSinkVolume(msg, res)
+			handleSetSinkVolume(&msg, &res)
 
 		case json.ActionSetSinkMuted:
-			handleSetSinkMuted(msg, res)
+			handleSetSinkMuted(&msg, &res)
 
 		case json.ActionSetSinkInputVolume:
-			handleSetSinkInputVolume(msg, res)
+			handleSetSinkInputVolume(&msg, &res)
 
 		case json.ActionSetSinkInputMuted:
-			handleSetSinkInputMuted(msg, res)
+			handleSetSinkInputMuted(&msg, &res)
 
 		case json.ActionGetCards:
 			handleGetCards(&res)
