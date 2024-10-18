@@ -137,9 +137,11 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 		handleServerLog(&msg, &res)
 
+		clientsMutex.Lock()
 		if err := conn.WriteJSON(res); err != nil {
 			log.Printf("Error writing JSON: %v\n", err)
 			break
 		}
+		clientsMutex.Unlock()
 	}
 }

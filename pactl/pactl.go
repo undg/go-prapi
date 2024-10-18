@@ -179,7 +179,8 @@ func ListenForChanges(callback func()) {
 	scanner := bufio.NewScanner(stdout)
 	for scanner.Scan() {
 		line := scanner.Text()
-		if strings.Contains(line, "sink") || strings.Contains(line, "server") {
+		if strings.Contains(line, "on sink-input") || strings.Contains(line, "on sink") {
+		log.Println(line)
 			callback()
 		}
 	}

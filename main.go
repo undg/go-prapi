@@ -7,6 +7,7 @@ import (
 
 	"github.com/undg/go-prapi/buildinfo"
 	"github.com/undg/go-prapi/json"
+	"github.com/undg/go-prapi/pactl"
 	"github.com/undg/go-prapi/utils"
 	"github.com/undg/go-prapi/ws"
 )
@@ -52,8 +53,7 @@ func main() {
 
 	startServer(mux)
 
-	// @TODO (undg) 2024-10-10: do not braodcast to client that send outgoing update
-	go ws.BroadcastUpdates()
+	go pactl.ListenForChanges(ws.BroadcastUpdates)
 
 	err := http.ListenAndServe(utils.PORT, mux)
 	if err != nil {
